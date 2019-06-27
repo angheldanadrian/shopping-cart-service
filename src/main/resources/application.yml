@@ -7,3 +7,12 @@ logging:
   level:
     ro.processor: DEBUG
     org.springframework: WARN
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+
+application:
+  shopping-cart-service:
+    name: shopping-cart-service
+  config:
+    mongo:
+      database: shopping-cart
+      host: mongodb+srv://admin:admin@shopping-cart-cluster-qidlq.gcp.mongodb.net/shopping-cart?retryWrites=true&w=majority
