@@ -58,6 +58,10 @@ public class ShoppingCartService {
 		return insertMongoCartDocument(productModels);
 	}
 
+	public void deleteByCustomerId(final String customerId) {
+		//TODO
+	}
+
 	private Optional<MongoCartDocument> updateMongoCartDocument(final List<ProductModel> productModels,
 																final Optional<MongoCartDocument> cartDocument) {
 		mongoCartRepository.delete(cartDocument.get());

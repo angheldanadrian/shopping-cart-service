@@ -73,4 +73,17 @@ public class ShoppingCartController {
 
 		return ResponseEntity.notFound().build();
 	}
+
+	@DeleteMapping(path = "/shopping-cart/{customerEcifId}")
+	@ApiOperation(value = "Deletes customer shopping cart record", response = ResponseEntity.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "customerEcifId",
+					value = "Unique ID that is common between Customer Connect and Needs Navigator", required = true,
+					dataType = "string", paramType = "path")
+	})
+	public ResponseEntity<MongoCartDocument> addShoppingCartRecords(@PathVariable final String customerEcifId) {
+
+		// TODO
+		return null;
+	}
 }
