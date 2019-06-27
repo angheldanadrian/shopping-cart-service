@@ -19,6 +19,8 @@ public class MongoCartDocument {
 	private String customerEcifId;
 	private String customerProfileType;
 	private String createdDate;
+	private String endDate;
+	private String rDate;
 	private String createdBy;
 	private String modifiedDate;
 	private String modifiedBy;

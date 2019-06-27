@@ -2,7 +2,7 @@ package com.processor.shoppingcartservice.controller
 
 import spock.lang.Specification
 
-class ShoppingCartControllerSpec extends Specification {
+class HealthCheckControllerSpec extends Specification {
 
     def healthCheckController = new HealthcheckController()
 
