@@ -28,10 +28,11 @@ public class SwaggerConfig {
 	private ApiInfo apiInfo() {
 		return new ApiInfo(
 				"Shopping Cart Service REST API",
-				" ",
+				"Responsible for adding, deleting and updating products in the customer shopping cart",
 				"API TOS",
 				"Terms of service",
 				new Contact("", "", "angheldanadrian@gmail.com"),
 				"", "", Collections.emptyList());
 	}
 }
+
