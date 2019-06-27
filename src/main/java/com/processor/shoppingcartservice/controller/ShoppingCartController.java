@@ -81,9 +81,13 @@ public class ShoppingCartController {
 					value = "Unique ID that is common between Customer Connect and Needs Navigator", required = true,
 					dataType = "string", paramType = "path")
 	})
-	public ResponseEntity<MongoCartDocument> addShoppingCartRecords(@PathVariable final String customerEcifId) {
+	public ResponseEntity addShoppingCartRecords(@PathVariable final String customerEcifId) {
 
-		// TODO
-		return null;
+		Boolean succeed = shoppingCartService.deleteByCustomerId(customerEcifId);
+		if (succeed == false) {
+			return ResponseEntity.notFound().build();
+		}
+
+		return ResponseEntity.ok().build();
 	}
 }

@@ -58,8 +58,20 @@ public class ShoppingCartService {
 		return insertMongoCartDocument(productModels);
 	}
 
-	public void deleteByCustomerId(final String customerId) {
-		//TODO
+	public Boolean deleteByCustomerId(final String customerEcifId) {
+		if (customerEcifId == null) {
+			log.info("Failed to deleted the shopping cart by customerId: {}", customerEcifId);
+			return false;
+		}
+
+		MongoCartDocument cartDocument = mongoCartRepository.findByCustomerEcifId(customerEcifId);
+		if (cartDocument != null) {
+			mongoCartRepository.delete(cartDocument);
+			log.info("Successfully deleted the shopping cart by customerId: {}", customerEcifId);
+			return true;
+		}
+
+		return false;
 	}
 
 	private Optional<MongoCartDocument> updateMongoCartDocument(final List<ProductModel> productModels,
