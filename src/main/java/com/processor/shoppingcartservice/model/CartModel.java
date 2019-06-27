@@ -1,21 +1,15 @@
-package com.processor.shoppingcartservice.document.mongo;
+package com.processor.shoppingcartservice.model;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
 @Getter
 @Setter
 @ToString
-@Builder
-@Document(collection = "cart")
-public class MongoCartDocument {
-	@Id
+public class CartModel {
 	private String id;
 	private String shopCartStatus;
 	private String customerEcifId;
@@ -26,5 +20,5 @@ public class MongoCartDocument {
 	private String createdBy;
 	private String modifiedDate;
 	private String modifiedBy;
-	private List<MongoProductDocument> products;
+	private List<ProductModel> products;
 }
