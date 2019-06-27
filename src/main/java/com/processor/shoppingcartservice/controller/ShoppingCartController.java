@@ -74,6 +74,26 @@ public class ShoppingCartController {
 		return ResponseEntity.notFound().build();
 	}
 
+	@PutMapping(path = "/shopping-cart/{customerEcifId}")
+	@ApiOperation(value = "Updates an existing customer shopping cart record", response = ResponseEntity.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "customerEcifId",
+					value = "Unique ID that is common between Customer Connect and Needs Navigator", required = true,
+					dataType = "string", paramType = "path"),
+			@ApiImplicitParam(name = "productIds", value = "productIds separated by comma", dataType = "string", paramType = "query")
+	})
+	public ResponseEntity<MongoCartDocument> updateExistingShoppingCart(@PathVariable final String customerEcifId,
+																		@RequestParam final String productIds) {
+
+		Optional<MongoCartDocument> doc = shoppingCartService.updateShoppingCartRecords(customerEcifId, productIds);
+
+		if (doc.isPresent()) {
+			return ResponseEntity.ok(doc.get());
+		}
+
+		return ResponseEntity.notFound().build();
+	}
+
 	@DeleteMapping(path = "/shopping-cart/{customerEcifId}")
 	@ApiOperation(value = "Deletes customer shopping cart record", response = ResponseEntity.class)
 	@ApiImplicitParams({

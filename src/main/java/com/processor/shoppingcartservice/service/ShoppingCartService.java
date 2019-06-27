@@ -14,10 +14,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -58,6 +60,39 @@ public class ShoppingCartService {
 		return insertMongoCartDocument(productModels);
 	}
 
+	public Optional<MongoCartDocument> updateShoppingCartRecords(final String customerEcifId, final String productIds) {
+		if (customerEcifId == null) {
+			log.error("Failed to update the shopping cart. No valid customerEcifId provided!");
+
+		}
+
+		MongoCartDocument cartDocument = mongoCartRepository.findByCustomerEcifId(customerEcifId);
+
+		List<MongoProductDocument> mongoProductDocuments = new ArrayList<>();
+		if (cartDocument != null) {
+			List<MongoProductDocument> products = cartDocument.getProducts();
+			split(productIds).stream().forEach(id -> {
+				mongoProductDocuments.addAll(products.stream().filter(prduct -> id.equals(prduct.getId()))
+						.map(updatedProduct -> MongoProductDocument.builder()
+								.productStatus("updated")
+								.build()).collect(Collectors.toList()));
+			});
+
+			if (mongoProductDocuments.size() == 0) {
+				log.warn("Failed to update the shopping cart! Given product codes are not present in the shopping cart!");
+			}
+
+			cartDocument.setProducts(mongoProductDocuments);
+			log.info("Successfully updated the cart records");
+
+			return Optional.of(mongoCartRepository.insert(cartDocument));
+		}
+
+		log.warn("Failed to update the shopping cart records due to the fact that there is no cart assigned to the " +
+				"following customerId: {}", customerEcifId);
+		return Optional.empty();
+	}
+
 	public Boolean deleteByCustomerId(final String customerEcifId) {
 		if (customerEcifId == null) {
 			log.info("Failed to deleted the shopping cart by customerId: {}", customerEcifId);
@@ -72,6 +107,12 @@ public class ShoppingCartService {
 		}
 
 		return false;
+	}
+
+	private List<String> split(String str) {
+		return Stream.of(str.split(","))
+				.map(String::new)
+				.collect(Collectors.toList());
 	}
 
 	private Optional<MongoCartDocument> updateMongoCartDocument(final List<ProductModel> productModels,
