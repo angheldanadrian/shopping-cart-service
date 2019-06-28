@@ -108,4 +108,23 @@ public class ShoppingCartControllerTest {
 		assertNotNull(actual.getBody().getProducts().get(0).getProductCode());
 		assertEquals(ShoppingCartStatus.OPEN.name(), actual.getBody().getProducts().get(0).getProductStatus());
 	}
+
+	@Test
+	public void When_addingShoppingCartRecords_Expect_HttpStatusNotFound() {
+		//given
+		String customerEcifId = "5628504543";
+		List<ProductModel> shoppingCartRecords = SHOPPING_CART_RECORDS;
+
+		//when
+		when(shoppingCartService.insertOrUpdateShoppingCartRecords(customerEcifId, shoppingCartRecords))
+				.thenReturn(Optional.empty());
+		ResponseEntity<MongoCartDocument> actual = shoppingCartController.addShoppingCartRecords(customerEcifId,
+				shoppingCartRecords);
+
+		//then
+		assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
+		assertNull(actual.getBody());
+		verify(shoppingCartService, times(1)).insertOrUpdateShoppingCartRecords(customerEcifId,
+				shoppingCartRecords);
+	}
 }
