@@ -106,7 +106,7 @@ public class ShoppingCartController {
 					value = "Unique ID that is common between Customer Connect and Needs Navigator", required = true,
 					dataType = "string", paramType = "path")
 	})
-	public ResponseEntity addShoppingCartRecords(@PathVariable final String customerEcifId) {
+	public ResponseEntity deleteShoppingCartRecords(@PathVariable final String customerEcifId) {
 
 		Boolean succeed = shoppingCartService.deleteByCustomerId(customerEcifId);
 		if (succeed == false) {

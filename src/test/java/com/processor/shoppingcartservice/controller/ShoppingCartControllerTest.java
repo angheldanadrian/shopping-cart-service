@@ -1,6 +1,8 @@
 package com.processor.shoppingcartservice.controller;
 
 import com.processor.shoppingcartservice.document.mongo.MongoCartDocument;
+import com.processor.shoppingcartservice.model.ProductModel;
+import com.processor.shoppingcartservice.model.ShoppingCartStatus;
 import com.processor.shoppingcartservice.service.ShoppingCartService;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,10 +16,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static com.processor.shoppingcartservice.TestUtils.SHOPPING_CART_DOCUMENT;
-import static com.processor.shoppingcartservice.TestUtils.SHOPPING_CART_DOCUMENTS;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static com.processor.shoppingcartservice.TestUtils.*;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -33,7 +33,7 @@ public class ShoppingCartControllerTest {
 	}
 
 	@Test
-	public void When_getShoppingCartByCustomerId_Expect_ShoppingCartDocument_And_HttpStatusOK() {
+	public void When_gettingShoppingCartByCustomerId_Expect_ShoppingCartDocument_And_HttpStatusOK() {
 		//given
 		String customerEcifId = "5628504543";
 		MongoCartDocument expectedResult = SHOPPING_CART_DOCUMENT;
@@ -49,7 +49,7 @@ public class ShoppingCartControllerTest {
 	}
 
 	@Test
-	public void When_getShoppingCartByCustomerId_Expect_HttpStatusNotFound() {
+	public void When_getttingShoppingCartByCustomerId_Expect_HttpStatusNotFound() {
 		//given
 		String customerEcifId = "5628504543";
 
@@ -64,7 +64,7 @@ public class ShoppingCartControllerTest {
 	}
 
 	@Test
-	public void When_filterCustomerShoppingCartRecords_Expect_ShoppingCartDocument() {
+	public void When_filteringCustomerShoppingCartRecords_Expect_ShoppingCartDocument() {
 		//given
 		String rdate = LocalDate.now().plusDays(1).toString();
 		String startDate = LocalDate.now().toString();
@@ -79,6 +79,33 @@ public class ShoppingCartControllerTest {
 
 		//then
 		assertEquals(expectedResult, actual);
-		verify(shoppingCartService, times(1)).findAllByRDateOrCreatedDateOrEndDate(rdate, startDate, endDate);
+		verify(shoppingCartService, times(1)).findAllByRDateOrCreatedDateOrEndDate(rdate,
+				startDate, endDate);
+	}
+
+	@Test
+	public void When_addingShoppingCartRecords_Expect_ShoppingCartDocument_And_HttpStatusOK() {
+		//given
+		String customerEcifId = "5628504543";
+		List<ProductModel> shoppingCartRecords = SHOPPING_CART_RECORDS;
+		MongoCartDocument expectedResult = SHOPPING_CART_DOCUMENT;
+
+		//when
+		when(shoppingCartService.insertOrUpdateShoppingCartRecords(customerEcifId, shoppingCartRecords))
+				.thenReturn(Optional.of(expectedResult));
+		ResponseEntity<MongoCartDocument> actual = shoppingCartController.addShoppingCartRecords(customerEcifId,
+				shoppingCartRecords);
+
+		//then
+		assertEquals(HttpStatus.OK, actual.getStatusCode());
+		assertEquals(expectedResult, actual.getBody());
+		verify(shoppingCartService, times(1)).insertOrUpdateShoppingCartRecords(customerEcifId,
+				shoppingCartRecords);
+		assertNotNull(actual.getBody().getProducts());
+		assertTrue(actual.getBody().getProducts().size() > 0);
+		assertNotNull(actual.getBody().getProducts().get(0).getId());
+		assertNotNull(actual.getBody().getProducts().get(0).getProductBundleCode());
+		assertNotNull(actual.getBody().getProducts().get(0).getProductCode());
+		assertEquals(ShoppingCartStatus.OPEN.name(), actual.getBody().getProducts().get(0).getProductStatus());
 	}
 }

@@ -1,12 +1,10 @@
 package com.processor.shoppingcartservice.model;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Setter
+@Builder
 @ToString
 public class ProductModel {
 	@NonNull

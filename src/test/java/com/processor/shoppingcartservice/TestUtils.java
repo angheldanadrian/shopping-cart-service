@@ -3,6 +3,7 @@ package com.processor.shoppingcartservice;
 import com.processor.shoppingcartservice.document.mongo.MongoCartDocument;
 import com.processor.shoppingcartservice.document.mongo.MongoProductDocument;
 import com.processor.shoppingcartservice.model.CustomerProfileType;
+import com.processor.shoppingcartservice.model.ProductModel;
 import com.processor.shoppingcartservice.model.ShoppingCartStatus;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,8 +27,18 @@ public class TestUtils {
 			.createdBy("loggedCustommer")
 			.modifiedDate(LocalDateTime.now().toString())
 			.modifiedBy("loggedCustommer")
-			.products(Arrays.asList(MongoProductDocument.builder().build()))
+			.products(Arrays.asList(MongoProductDocument.builder().id(UUID.randomUUID().toString())
+					.productCode(UUID.randomUUID().toString())
+					.productStatus(ShoppingCartStatus.OPEN.name())
+					.productBundleCode(UUID.randomUUID().toString()).build()))
 			.build();
 
 	public static final List<MongoCartDocument> SHOPPING_CART_DOCUMENTS = Arrays.asList(SHOPPING_CART_DOCUMENT);
+
+	public static final ProductModel SHOPPING_CART_RECORD = ProductModel.builder()
+			.id(UUID.randomUUID().toString()).productCode(UUID.randomUUID().toString())
+			.productStatus(ShoppingCartStatus.OPEN.name())
+			.productBundleCode(UUID.randomUUID().toString()).build();
+
+	public static final List<ProductModel> SHOPPING_CART_RECORDS = Arrays.asList(SHOPPING_CART_RECORD);
 }
