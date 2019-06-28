@@ -10,9 +10,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static com.processor.shoppingcartservice.TestUtils.SHOPPING_CART_DOCUMENT;
+import static com.processor.shoppingcartservice.TestUtils.SHOPPING_CART_DOCUMENTS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.*;
@@ -58,5 +61,24 @@ public class ShoppingCartControllerTest {
 		assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
 		assertNull(actual.getBody());
 		verify(shoppingCartService, times(1)).findById(customerEcifId);
+	}
+
+	@Test
+	public void When_filterCustomerShoppingCartRecords_Expect_ShoppingCartDocument() {
+		//given
+		String rdate = LocalDate.now().plusDays(1).toString();
+		String startDate = LocalDate.now().toString();
+		String endDate = LocalDate.now().plusDays(10).toString();
+		List<MongoCartDocument> expectedResult = SHOPPING_CART_DOCUMENTS;
+
+		//when
+		when(shoppingCartService.findAllByRDateOrCreatedDateOrEndDate(rdate, startDate, endDate))
+				.thenReturn(expectedResult);
+		List<MongoCartDocument> actual = shoppingCartController
+				.filterCustomerShoppingCartRecords(rdate, startDate, endDate);
+
+		//then
+		assertEquals(expectedResult, actual);
+		verify(shoppingCartService, times(1)).findAllByRDateOrCreatedDateOrEndDate(rdate, startDate, endDate);
 	}
 }
