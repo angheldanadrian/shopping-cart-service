@@ -145,6 +145,7 @@ public class ShoppingCartService {
 
 	private List<MongoProductDocument> collectProductDocument(List<ProductModel> productModels) {
 		return productModels.stream().map(productModel -> MongoProductDocument.builder()
+				.id(UUID.randomUUID().toString())
 				.closedBy(productModel.getClosedBy())
 				.closedDate(productModel.getClosedDate())
 				.createdBy(productModel.getCreatedBy())

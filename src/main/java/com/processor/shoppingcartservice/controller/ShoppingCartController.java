@@ -68,7 +68,7 @@ public class ShoppingCartController {
 					dataType = "string", paramType = "path")
 	})
 	public ResponseEntity<MongoCartDocument> addShoppingCartRecords(@PathVariable final String shoppingCartId,
-																	@Valid final List<ProductModel> productModels) {
+																	@RequestBody final List<ProductModel> productModels) {
 
 		Optional<MongoCartDocument> doc = shoppingCartService.insertOrUpdateShoppingCartRecords(shoppingCartId, productModels);
 
