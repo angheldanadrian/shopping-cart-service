@@ -12,13 +12,18 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
 public class ShoppingCartController {
 
-	@Autowired
 	private ShoppingCartService shoppingCartService;
+
+	@Autowired
+	public ShoppingCartController(final ShoppingCartService shoppingCartService) {
+		this.shoppingCartService = Objects.requireNonNull(shoppingCartService, "shoppingCartService must not be null!");
+	}
 
 	@GetMapping(path = "/shopping-cart")
 	@ApiOperation(value = "Filter customer shopping cart records", response = ResponseEntity.class)
