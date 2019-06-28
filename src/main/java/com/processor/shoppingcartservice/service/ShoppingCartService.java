@@ -77,14 +77,8 @@ public class ShoppingCartService {
 
 		List<MongoProductDocument> mongoProductDocuments = new ArrayList<>();
 		if (cartDocument != null) {
-			List<MongoProductDocument> products = cartDocument.getProducts();
-			split(productIds).stream().forEach(id -> {
-				mongoProductDocuments.addAll(products.stream().filter(prduct -> id.equals(prduct.getId()))
-						.map(updatedProduct -> MongoProductDocument.builder()
-								.productStatus("updated")
-								.build()).collect(Collectors.toList()));
-			});
-
+			mongoCartRepository.delete(cartDocument);
+			updateProduct(productIds, mongoProductDocuments, cartDocument.getProducts());
 			if (mongoProductDocuments.size() == 0) {
 				log.warn("Failed to update the shopping cart! Given product codes are not present in the shopping cart!");
 			}
@@ -114,6 +108,23 @@ public class ShoppingCartService {
 		}
 
 		return false;
+	}
+
+	private void updateProduct(String productIds, List<MongoProductDocument> mongoProductDocuments,
+							   List<MongoProductDocument> products) {
+		split(productIds).stream().forEach(id -> mongoProductDocuments.addAll(products.stream().filter(prduct -> id.equals(prduct.getId()))
+				.map(updatedProduct -> MongoProductDocument.builder()
+						.productStatus("updated")
+						.id(updatedProduct.getId())
+						.productCode(updatedProduct.getProductCode())
+						.productName(updatedProduct.getProductName())
+						.productCategory(updatedProduct.getProductCategory())
+						.productBundleCode(updatedProduct.getProductBundleCode())
+						.createdBy(updatedProduct.getCreatedBy())
+						.createdDate(updatedProduct.getCreatedDate())
+						.closedDate(updatedProduct.getClosedDate())
+						.closedBy(updatedProduct.getClosedBy())
+						.build()).collect(Collectors.toList())));
 	}
 
 	private List<String> split(String str) {
