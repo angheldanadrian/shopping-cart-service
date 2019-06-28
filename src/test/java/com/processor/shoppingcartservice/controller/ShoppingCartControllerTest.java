@@ -33,7 +33,7 @@ public class ShoppingCartControllerTest {
 	}
 
 	@Test
-	public void When_gettingShoppingCartByCustomerId_Expect_ShoppingCartDocument_And_HttpStatusOK() {
+	public void when_gettingShoppingCartByCustomerId_Expect_ShoppingCartDocument_And_HttpStatusOK() {
 		//given
 		String customerEcifId = "5628504543";
 		MongoCartDocument expectedResult = SHOPPING_CART_DOCUMENT;
@@ -49,7 +49,7 @@ public class ShoppingCartControllerTest {
 	}
 
 	@Test
-	public void When_getttingShoppingCartByCustomerId_Expect_HttpStatusNotFound() {
+	public void when_getttingShoppingCartByCustomerId_Expect_HttpStatusNotFound() {
 		//given
 		String customerEcifId = "5628504543";
 
@@ -64,7 +64,7 @@ public class ShoppingCartControllerTest {
 	}
 
 	@Test
-	public void When_filteringCustomerShoppingCartRecords_Expect_ShoppingCartDocument() {
+	public void when_filteringCustomerShoppingCartRecords_Expect_ShoppingCartDocument() {
 		//given
 		String rdate = LocalDate.now().plusDays(1).toString();
 		String startDate = LocalDate.now().toString();
@@ -84,7 +84,7 @@ public class ShoppingCartControllerTest {
 	}
 
 	@Test
-	public void When_addingShoppingCartRecords_Expect_ShoppingCartDocument_And_HttpStatusOK() {
+	public void when_addingShoppingCartRecords_Expect_ShoppingCartDocument_And_HttpStatusOK() {
 		//given
 		String customerEcifId = "5628504543";
 		List<ProductModel> shoppingCartRecords = SHOPPING_CART_RECORDS;
@@ -110,7 +110,7 @@ public class ShoppingCartControllerTest {
 	}
 
 	@Test
-	public void When_addingShoppingCartRecords_Expect_HttpStatusNotFound() {
+	public void when_addingShoppingCartRecords_Expect_HttpStatusNotFound() {
 		//given
 		String customerEcifId = "5628504543";
 		List<ProductModel> shoppingCartRecords = SHOPPING_CART_RECORDS;
