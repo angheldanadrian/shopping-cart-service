@@ -38,10 +38,17 @@ public class ShoppingCartService {
 		return mongoCartRepository.findAllByRDateOrCreatedDateOrEndDate(rdate, startdate, endDate);
 	}
 
-	public Optional<MongoCartDocument> findById(final String customerId) {
+	public Optional<MongoCartDocument> findByCustomerId(final String customerId) {
 		log.info("Search document by customerId: {}", customerId);
 
-		return mongoCartRepository.findById(customerId);
+		MongoCartDocument mongoCartDocument = mongoCartRepository.findByCustomerEcifId(customerId);
+		if (mongoCartDocument == null) {
+			log.warn("Failed to find the shopping cat by customerId: {}! There is no shopping cart available for the " +
+					"given id.", customerId);
+			return Optional.empty();
+		}
+
+		return Optional.of(mongoCartDocument);
 	}
 
 	public Optional<MongoCartDocument> insertOrUpdateShoppingCartRecords(final String shoppingCartId,

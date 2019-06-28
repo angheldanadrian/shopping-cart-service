@@ -39,13 +39,13 @@ public class ShoppingCartControllerTest {
 		MongoCartDocument expectedResult = SHOPPING_CART_DOCUMENT;
 
 		//when
-		when(shoppingCartService.findById(customerEcifId)).thenReturn(Optional.of(expectedResult));
+		when(shoppingCartService.findByCustomerId(customerEcifId)).thenReturn(Optional.of(expectedResult));
 		ResponseEntity<MongoCartDocument> actual = shoppingCartController.findByCustomerId(customerEcifId);
 
 		//then
 		assertEquals(HttpStatus.OK, actual.getStatusCode());
 		assertEquals(expectedResult, actual.getBody());
-		verify(shoppingCartService, times(1)).findById(customerEcifId);
+		verify(shoppingCartService, times(1)).findByCustomerId(customerEcifId);
 	}
 
 	@Test
@@ -54,13 +54,13 @@ public class ShoppingCartControllerTest {
 		String customerEcifId = "5628504543";
 
 		//when
-		when(shoppingCartService.findById(customerEcifId)).thenReturn(Optional.empty());
+		when(shoppingCartService.findByCustomerId(customerEcifId)).thenReturn(Optional.empty());
 		ResponseEntity<MongoCartDocument> actual = shoppingCartController.findByCustomerId(customerEcifId);
 
 		//then
 		assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
 		assertNull(actual.getBody());
-		verify(shoppingCartService, times(1)).findById(customerEcifId);
+		verify(shoppingCartService, times(1)).findByCustomerId(customerEcifId);
 	}
 
 	@Test

@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -51,7 +50,7 @@ public class ShoppingCartController {
 	})
 	public ResponseEntity<MongoCartDocument> findByCustomerId(@PathVariable final String customerEcifId) {
 
-		Optional<MongoCartDocument> doc = shoppingCartService.findById(customerEcifId);
+		Optional<MongoCartDocument> doc = shoppingCartService.findByCustomerId(customerEcifId);
 
 		if (doc.isPresent()) {
 			return ResponseEntity.ok(doc.get());
