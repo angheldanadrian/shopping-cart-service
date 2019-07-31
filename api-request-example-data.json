@@ -1,0 +1,248 @@
+//
+//
+// POST /shopping-cart
+
+// Need To:
+// 1. Check if customerEcifId record does not exist. If it does, return error with a meaningful message
+
+//REQUEST:
+{
+  "customerEcifId": "19054836514236665720190124162542674", //required
+  "customerProfileType": "Personal",
+  "createdBy": "BobMarley123", //required
+  "products": [
+    {
+      "productCode": "TDR", //required
+      "productName": "BMO Term Deposit Receipt",
+      "productCategory": "PINV" //required
+    }
+  ]
+}
+
+//RESPONSE:
+{
+    "_id": "568c28fffc4be30d44d0398e", //server creates/updates value
+    "shopCartStatus": "open", //server creates/updates value
+    "customerEcifId": "19054836514236665720190124162542674",
+    "customerProfileType": "Personal",
+    "createdDate": "2015-01-07", //server creates/updates value
+    "createdBy": "BobMarley123",
+    "modifiedDate": "2015-01-07", //server creates/updates value
+    "modifiedBy": "BobMarley123", //server creates/updates value
+    "products": [
+      {
+        "_id": "768a28fffc4ae30f44f0398a", //server creates/updates value
+        "productStatus": "open", //server creates/updates value
+        "productCode": "TDR",
+        "productName": "BMO Term Deposit Receipt",
+        "productCategory": "PINV",
+        "productBundleCode": "",
+        "createdDate": "2015-01-07", //server creates/updates value
+        "createdBy": "BobMarley123", //server creates/updates value
+        "closedDate": "",
+        "closedBy": ""
+      }
+    ]
+  }
+
+
+//
+//
+// PUT /shopping-cart/{customerEcifId}
+
+//REQUEST:
+// Example: /shopping-cart/19054836514236665720190124162542674
+{
+    "modifiedBy": "SteveJobs123",
+    "products": [
+      {
+        "productCode": "TDR2", //required
+        "productName": "BMO Term Deposit Receipt 2",
+        "productCategory": "PINV2" //required
+      },
+      {
+        "productCode": "TDR3", //required
+        "productName": "BMO Term Deposit Receipt 3",
+        "productCategory": "PINV3" //required
+      }
+    ]
+}
+
+//RESPONSE:
+{
+    "_id": "568c28fffc4be30d44d0398e",
+    "shopCartStatus": "open",
+    "customerEcifId": "19054836514236665720190124162542674",
+    "customerProfileType": "Personal",
+    "createdDate": "2015-01-07",
+    "createdBy": "BobMarley123",
+    "modifiedDate": "2015-02-07", //server creates/updates value
+    "modifiedBy": "SteveJobs123", //value from request
+    "products": [
+      {
+        "_id": "768a28fffc4ae30f44f0398a",
+        "productStatus": "open",
+        "productCode": "TDR",
+        "productName": "BMO Term Deposit Receipt",
+        "productCategory": "PINV",
+        "productBundleCode": "",
+        "createdDate": "2015-01-07",
+        "createdBy": "BobMarley123",
+        "closedDate": "",
+        "closedBy": ""
+      },
+      {
+        "_id": "228a28fffc4ae30f44f0398a", //server creates/updates value
+        "productStatus": "open", //server creates/updates value
+        "productCode": "TDR2",
+        "productName": "BMO Term Deposit Receipt 2",
+        "productCategory": "PINV2",
+        "productBundleCode": "",
+        "createdDate": "2015-02-07", //server creates/updates value
+        "createdBy": "SteveJobs123",  //value from request (modifiedBy)
+        "closedDate": "",
+        "closedBy": ""
+      },
+      {
+        "_id": "338a28fffc4ae30f44f0398a", //server creates/updates value
+        "productStatus": "open", //server creates/updates value
+        "productCode": "TDR3",
+        "productName": "BMO Term Deposit Receipt 3",
+        "productCategory": "PINV3",
+        "productBundleCode": "",
+        "createdDate": "2015-02-07", //server creates/updates value
+        "createdBy": "SteveJobs123",  //value from request (modifiedBy)
+        "closedDate": "",
+        "closedBy": ""
+      }
+    ]
+  }
+
+    
+//
+//
+// GET /shopping-cart/filter
+// REQUEST Example: /shopping-cart/filter
+
+    
+//
+//
+// GET /shopping-cart
+// REQUEST Example: /shopping-cart
+// Note: return all records
+
+   
+//
+//
+// DELETE /shopping-cart/products/{customerEcifId}
+// Note 1: delete only products, NOT a shopping cart record itself
+// Note 2: IF there is NO products left in shopping cart mark shopping cart as CLOSED
+
+//REQUEST:
+// Example: /shopping-cart/products/19054836514236665720190124162542674
+{
+    "modifiedBy": "MonaLisa123",
+    "products": [
+      "338a28fffc4ae30f44f0398a"
+    ]
+}
+
+//RESPONSE:
+{
+    "_id": "568c28fffc4be30d44d0398e",
+    "shopCartStatus": "open",
+    "customerEcifId": "19054836514236665720190124162542674",
+    "customerProfileType": "Personal",
+    "createdDate": "2015-01-07",
+    "createdBy": "BobMarley123",
+    "modifiedDate": "2015-03-07", //server creates/updates value
+    "modifiedBy": "MonaLisa123", //value from request
+    "products": [
+      {
+        "_id": "768a28fffc4ae30f44f0398a",
+        "productStatus": "open",
+        "productCode": "TDR",
+        "productName": "BMO Term Deposit Receipt",
+        "productCategory": "PINV",
+        "productBundleCode": "",
+        "createdDate": "2015-01-07",
+        "createdBy": "BobMarley123",
+        "closedDate": "",
+        "closedBy": ""
+      },
+      {
+        "_id": "228a28fffc4ae30f44f0398a",
+        "productStatus": "open",
+        "productCode": "TDR2",
+        "productName": "BMO Term Deposit Receipt 2",
+        "productCategory": "PINV2",
+        "productBundleCode": "",
+        "createdDate": "2015-02-07",
+        "createdBy": "SteveJobs123",
+        "closedDate": "",
+        "closedBy": ""
+      }
+    ]
+  }
+
+     
+//
+//
+// PUT /shopping-cart/checkout/{customerEcifId}
+
+//REQUEST:
+// Example: /shopping-cart/checkout/19054836514236665720190124162542674
+
+//#1
+{
+    "modifiedBy": "AllaFly123",
+    "products": [
+      "768a28fffc4ae30f44f0398a"
+    ]
+}
+
+//#2
+{
+    "modifiedBy": "BobFly123",
+    "products": [
+      "228a28fffc4ae30f44f0398a"
+    ]
+}
+
+//RESPONSE:
+{
+    "_id": "568c28fffc4be30d44d0398e",
+    "shopCartStatus": "closed", //server creates/updates value #2
+    "customerEcifId": "19054836514236665720190124162542674",
+    "customerProfileType": "Personal",
+    "createdDate": "2015-01-07",
+    "createdBy": "BobMarley123",
+    "modifiedDate": "2015-04-07", //server creates/updates value
+    "modifiedBy": "BobFly123", //value from request
+    "products": [
+      {
+        "_id": "768a28fffc4ae30f44f0398a",
+        "productStatus": "closed", //server creates/updates value
+        "productCode": "TDR",
+        "productName": "BMO Term Deposit Receipt",
+        "productCategory": "PINV",
+        "productBundleCode": "",
+        "createdDate": "2015-01-07",
+        "createdBy": "BobMarley123",
+        "closedDate": "2015-04-07", //server creates/updates value
+        "closedBy": "AllaFly123" //value from request
+      },
+      {
+        "_id": "228a28fffc4ae30f44f0398a", //server creates/updates value #2
+        "productStatus": "closed",
+        "productCode": "TDR2",
+        "productName": "BMO Term Deposit Receipt 2",
+        "productCategory": "PINV2",
+        "productBundleCode": "",
+        "createdDate": "2015-02-07",
+        "createdBy": "SteveJobs123",
+        "closedDate": "2015-04-07", //server creates/updates value #2
+        "closedBy": "BobFly123" //value from request #2
+      }
+    ]
+  }
