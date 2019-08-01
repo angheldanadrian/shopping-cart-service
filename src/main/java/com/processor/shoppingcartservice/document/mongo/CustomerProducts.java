@@ -1,5 +1,7 @@
 package com.processor.shoppingcartservice.document.mongo;
 
+import com.processor.shoppingcartservice.model.CustomerProfileType;
+import com.processor.shoppingcartservice.model.ShoppingCartStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,16 +17,16 @@ import java.util.List;
 @Builder
 @Document(collection = "cart")
 public class CustomerProducts {
-	@Id
-	private String id;
-	private String shopCartStatus;
-	private String customerEcifId;
-	private String customerProfileType;
-	private String createdDate;
-	private String endDate;
-	private String rDate;
-	private String createdBy;
-	private String modifiedDate;
-	private String modifiedBy;
-	private List<Product> products;
+    @Id
+    private String id;
+    private ShoppingCartStatus shopCartStatus;
+    private String customerEcifId;
+    private CustomerProfileType customerProfileType;
+    private String createdDate;
+    private String endDate;
+    private String rDate;
+    private String createdBy;
+    private String modifiedDate;
+    private String modifiedBy;
+    private List<Product> products;
 }

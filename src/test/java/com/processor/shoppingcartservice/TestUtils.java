@@ -18,9 +18,9 @@ public class TestUtils {
 	public static final RestTemplate REST = new RestTemplate();
 
 	public static final CustomerProducts SHOPPING_CART_DOCUMENT = CustomerProducts.builder()
-			.shopCartStatus(ShoppingCartStatus.OPEN.name())
+			.shopCartStatus(ShoppingCartStatus.OPEN)
 			.customerEcifId(UUID.randomUUID().toString())
-			.customerProfileType(CustomerProfileType.PERSONAL.name())
+			.customerProfileType(CustomerProfileType.PERSONAL)
 			.createdDate(LocalDateTime.now().toString())
 			.endDate(LocalDateTime.now().plusMinutes(15).toString())
 			.rDate(LocalDate.now().toString())

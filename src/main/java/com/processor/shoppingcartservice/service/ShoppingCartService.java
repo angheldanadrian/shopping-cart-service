@@ -146,9 +146,9 @@ public class ShoppingCartService {
 	private Optional<CustomerProducts> insertMongoCartDocument(final List<ProductModel> productModels) {
 
 		CustomerProducts newCartDocument = CustomerProducts.builder()
-				.shopCartStatus(ShoppingCartStatus.OPEN.name())
+				.shopCartStatus(ShoppingCartStatus.OPEN)
 				.customerEcifId(UUID.randomUUID().toString())
-				.customerProfileType(CustomerProfileType.PERSONAL.name())
+				.customerProfileType(CustomerProfileType.PERSONAL)
 				.createdDate(LocalDateTime.now().toString())
 				.endDate(LocalDateTime.now().plusMinutes(15).toString())
 				.rDate(LocalDate.now().toString())
