@@ -1,6 +1,6 @@
 package com.processor.shoppingcartservice.controller;
 
-import com.processor.shoppingcartservice.document.mongo.MongoCartDocument;
+import com.processor.shoppingcartservice.document.mongo.CustomerProducts;
 import com.processor.shoppingcartservice.model.ProductModel;
 import com.processor.shoppingcartservice.model.ShoppingCartStatus;
 import com.processor.shoppingcartservice.service.ShoppingCartService;
@@ -36,11 +36,11 @@ public class ShoppingCartControllerTest {
 	public void when_gettingShoppingCartByCustomerId_Expect_ShoppingCartDocument_And_HttpStatusOK() {
 		//given
 		String customerEcifId = "5628504543";
-		MongoCartDocument expectedResult = SHOPPING_CART_DOCUMENT;
+		CustomerProducts expectedResult = SHOPPING_CART_DOCUMENT;
 
 		//when
 		when(shoppingCartService.findByCustomerId(customerEcifId)).thenReturn(Optional.of(expectedResult));
-		ResponseEntity<MongoCartDocument> actual = shoppingCartController.findByCustomerId(customerEcifId);
+		ResponseEntity<CustomerProducts> actual = shoppingCartController.findByCustomerId(customerEcifId);
 
 		//then
 		assertEquals(HttpStatus.OK, actual.getStatusCode());
@@ -55,7 +55,7 @@ public class ShoppingCartControllerTest {
 
 		//when
 		when(shoppingCartService.findByCustomerId(customerEcifId)).thenReturn(Optional.empty());
-		ResponseEntity<MongoCartDocument> actual = shoppingCartController.findByCustomerId(customerEcifId);
+		ResponseEntity<CustomerProducts> actual = shoppingCartController.findByCustomerId(customerEcifId);
 
 		//then
 		assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
@@ -69,12 +69,12 @@ public class ShoppingCartControllerTest {
 		String rdate = LocalDate.now().plusDays(1).toString();
 		String startDate = LocalDate.now().toString();
 		String endDate = LocalDate.now().plusDays(10).toString();
-		List<MongoCartDocument> expectedResult = SHOPPING_CART_DOCUMENTS;
+		List<CustomerProducts> expectedResult = SHOPPING_CART_DOCUMENTS;
 
 		//when
 		when(shoppingCartService.findAllByRDateOrCreatedDateOrEndDate(rdate, startDate, endDate))
 				.thenReturn(expectedResult);
-		List<MongoCartDocument> actual = shoppingCartController
+		List<CustomerProducts> actual = shoppingCartController
 				.filterCustomerShoppingCartRecords(rdate, startDate, endDate);
 
 		//then
@@ -88,12 +88,12 @@ public class ShoppingCartControllerTest {
 		//given
 		String customerEcifId = "5628504543";
 		List<ProductModel> shoppingCartRecords = SHOPPING_CART_RECORDS;
-		MongoCartDocument expectedResult = SHOPPING_CART_DOCUMENT;
+		CustomerProducts expectedResult = SHOPPING_CART_DOCUMENT;
 
 		//when
 		when(shoppingCartService.insertOrUpdateShoppingCartRecords(customerEcifId, shoppingCartRecords))
 				.thenReturn(Optional.of(expectedResult));
-		ResponseEntity<MongoCartDocument> actual = shoppingCartController.addShoppingCartRecords(customerEcifId,
+		ResponseEntity<CustomerProducts> actual = shoppingCartController.addShoppingCartRecords(customerEcifId,
 				shoppingCartRecords);
 
 		//then
@@ -118,7 +118,7 @@ public class ShoppingCartControllerTest {
 		//when
 		when(shoppingCartService.insertOrUpdateShoppingCartRecords(customerEcifId, shoppingCartRecords))
 				.thenReturn(Optional.empty());
-		ResponseEntity<MongoCartDocument> actual = shoppingCartController.addShoppingCartRecords(customerEcifId,
+		ResponseEntity<CustomerProducts> actual = shoppingCartController.addShoppingCartRecords(customerEcifId,
 				shoppingCartRecords);
 
 		//then
@@ -134,12 +134,12 @@ public class ShoppingCartControllerTest {
 		//given
 		String customerEcifId = "5628504543";
 		String productIds = "4325435,756765876,56645654,5435,8769679,543424654";
-		MongoCartDocument expectedResult = SHOPPING_CART_DOCUMENT;
+		CustomerProducts expectedResult = SHOPPING_CART_DOCUMENT;
 
 		//when
 		when(shoppingCartService.updateShoppingCartRecords(customerEcifId, productIds)).thenReturn(
 				Optional.of(expectedResult));
-		ResponseEntity<MongoCartDocument> actual = shoppingCartController.updateExistingShoppingCart(customerEcifId,
+		ResponseEntity<CustomerProducts> actual = shoppingCartController.updateExistingShoppingCart(customerEcifId,
 				productIds);
 
 		//then
@@ -157,7 +157,7 @@ public class ShoppingCartControllerTest {
 		//when
 		when(shoppingCartService.insertOrUpdateShoppingCartRecords(customerEcifId, shoppingCartRecords))
 				.thenReturn(Optional.empty());
-		ResponseEntity<MongoCartDocument> actual = shoppingCartController.addShoppingCartRecords(customerEcifId,
+		ResponseEntity<CustomerProducts> actual = shoppingCartController.addShoppingCartRecords(customerEcifId,
 				shoppingCartRecords);
 
 		//then
@@ -174,7 +174,7 @@ public class ShoppingCartControllerTest {
 
 		//when
 		when(shoppingCartService.deleteByCustomerId(customerEcifId)).thenReturn(Boolean.TRUE);
-		ResponseEntity<MongoCartDocument> actual = shoppingCartController.deleteShoppingCartRecords(customerEcifId);
+		ResponseEntity<CustomerProducts> actual = shoppingCartController.deleteShoppingCartRecords(customerEcifId);
 
 		//then
 		assertEquals(HttpStatus.OK, actual.getStatusCode());
@@ -189,7 +189,7 @@ public class ShoppingCartControllerTest {
 
 		//when
 		when(shoppingCartService.deleteByCustomerId(customerEcifId)).thenReturn(Boolean.FALSE);
-		ResponseEntity<MongoCartDocument> actual = shoppingCartController.deleteShoppingCartRecords(customerEcifId);
+		ResponseEntity<CustomerProducts> actual = shoppingCartController.deleteShoppingCartRecords(customerEcifId);
 
 		//then
 		assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());

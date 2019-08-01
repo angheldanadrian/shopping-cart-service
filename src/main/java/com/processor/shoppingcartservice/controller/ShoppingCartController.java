@@ -1,6 +1,6 @@
 package com.processor.shoppingcartservice.controller;
 
-import com.processor.shoppingcartservice.document.mongo.MongoCartDocument;
+import com.processor.shoppingcartservice.document.mongo.CustomerProducts;
 import com.processor.shoppingcartservice.model.ProductModel;
 import com.processor.shoppingcartservice.service.ShoppingCartService;
 import io.swagger.annotations.ApiImplicitParam;
@@ -34,9 +34,9 @@ public class ShoppingCartController {
 			@ApiImplicitParam(name = "end_date", value = "The end date for the report. Must be used together with start_date. " +
 					"This parameter is incompatible with rdate.", dataType = "string", paramType = "query")
 	})
-	public List<MongoCartDocument> filterCustomerShoppingCartRecords(@RequestParam(required = false) final String rdate,
-																	 @RequestParam(required = false) final String startdate,
-																	 @RequestParam(required = false) final String endDate) {
+	public List<CustomerProducts> filterCustomerShoppingCartRecords(@RequestParam(required = false) final String rdate,
+                                                                    @RequestParam(required = false) final String startdate,
+                                                                    @RequestParam(required = false) final String endDate) {
 
 		return shoppingCartService.findAllByRDateOrCreatedDateOrEndDate(rdate, startdate, endDate);
 	}
@@ -48,9 +48,9 @@ public class ShoppingCartController {
 					value = "Unique ID that is common between Customer Connect and Needs Navigator", required = true,
 					dataType = "string", paramType = "path")
 	})
-	public ResponseEntity<MongoCartDocument> findByCustomerId(@PathVariable final String customerEcifId) {
+	public ResponseEntity<CustomerProducts> findByCustomerId(@PathVariable final String customerEcifId) {
 
-		Optional<MongoCartDocument> doc = shoppingCartService.findByCustomerId(customerEcifId);
+		Optional<CustomerProducts> doc = shoppingCartService.findByCustomerId(customerEcifId);
 
 		if (doc.isPresent()) {
 			return ResponseEntity.ok(doc.get());
@@ -66,10 +66,10 @@ public class ShoppingCartController {
 					value = "Unique ID of a shopping cart", required = true,
 					dataType = "string", paramType = "path")
 	})
-	public ResponseEntity<MongoCartDocument> addShoppingCartRecords(@PathVariable final String shoppingCartId,
-																	@RequestBody final List<ProductModel> productModels) {
+	public ResponseEntity<CustomerProducts> addShoppingCartRecords(@PathVariable final String shoppingCartId,
+                                                                   @RequestBody final List<ProductModel> productModels) {
 
-		Optional<MongoCartDocument> doc = shoppingCartService.insertOrUpdateShoppingCartRecords(shoppingCartId, productModels);
+		Optional<CustomerProducts> doc = shoppingCartService.insertOrUpdateShoppingCartRecords(shoppingCartId, productModels);
 
 		if (doc.isPresent()) {
 			return ResponseEntity.ok(doc.get());
@@ -86,10 +86,10 @@ public class ShoppingCartController {
 					dataType = "string", paramType = "path"),
 			@ApiImplicitParam(name = "productIds", value = "productIds separated by comma", dataType = "string", paramType = "query")
 	})
-	public ResponseEntity<MongoCartDocument> updateExistingShoppingCart(@PathVariable final String customerEcifId,
-																		@RequestParam final String productIds) {
+	public ResponseEntity<CustomerProducts> updateExistingShoppingCart(@PathVariable final String customerEcifId,
+                                                                       @RequestParam final String productIds) {
 
-		Optional<MongoCartDocument> doc = shoppingCartService.updateShoppingCartRecords(customerEcifId, productIds);
+		Optional<CustomerProducts> doc = shoppingCartService.updateShoppingCartRecords(customerEcifId, productIds);
 
 		if (doc.isPresent()) {
 			return ResponseEntity.ok(doc.get());

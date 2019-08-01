@@ -14,7 +14,7 @@ import java.util.List;
 @ToString
 @Builder
 @Document(collection = "cart")
-public class MongoCartDocument {
+public class CustomerProducts {
 	@Id
 	private String id;
 	private String shopCartStatus;
@@ -26,5 +26,5 @@ public class MongoCartDocument {
 	private String createdBy;
 	private String modifiedDate;
 	private String modifiedBy;
-	private List<MongoProductDocument> products;
+	private List<Product> products;
 }

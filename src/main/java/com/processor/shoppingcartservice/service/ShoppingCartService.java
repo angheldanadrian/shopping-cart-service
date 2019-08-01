@@ -1,7 +1,7 @@
 package com.processor.shoppingcartservice.service;
 
-import com.processor.shoppingcartservice.document.mongo.MongoCartDocument;
-import com.processor.shoppingcartservice.document.mongo.MongoProductDocument;
+import com.processor.shoppingcartservice.document.mongo.CustomerProducts;
+import com.processor.shoppingcartservice.document.mongo.Product;
 import com.processor.shoppingcartservice.model.CustomerProfileType;
 import com.processor.shoppingcartservice.model.ProductModel;
 import com.processor.shoppingcartservice.model.ShoppingCartStatus;
@@ -31,35 +31,35 @@ public class ShoppingCartService {
 	private MongoCartRepository mongoCartRepository;
 
 
-	public List<MongoCartDocument> findAllByRDateOrCreatedDateOrEndDate(final String rdate, final String startdate,
-																		final String endDate) {
+	public List<CustomerProducts> findAllByRDateOrCreatedDateOrEndDate(final String rdate, final String startdate,
+                                                                       final String endDate) {
 		log.info("Search document by rdate: {}, startDate: {}, endDate: {}", rdate, startdate, endDate);
 
 		return mongoCartRepository.findAllByRDateOrCreatedDateOrEndDate(rdate, startdate, endDate);
 	}
 
-	public Optional<MongoCartDocument> findByCustomerId(final String customerId) {
+	public Optional<CustomerProducts> findByCustomerId(final String customerId) {
 		log.info("Search document by customerId: {}", customerId);
 
-		MongoCartDocument mongoCartDocument = mongoCartRepository.findByCustomerEcifId(customerId);
-		if (mongoCartDocument == null) {
+		CustomerProducts customerProducts = mongoCartRepository.findByCustomerEcifId(customerId);
+		if (customerProducts == null) {
 			log.warn("Failed to find the shopping cat by customerId: {}! There is no shopping cart available for the " +
 					"given id.", customerId);
 			return Optional.empty();
 		}
 
-		return Optional.of(mongoCartDocument);
+		return Optional.of(customerProducts);
 	}
 
-	public Optional<MongoCartDocument> insertOrUpdateShoppingCartRecords(final String shoppingCartId,
-																		 final List<ProductModel> productModels) {
+	public Optional<CustomerProducts> insertOrUpdateShoppingCartRecords(final String shoppingCartId,
+                                                                        final List<ProductModel> productModels) {
 		if (shoppingCartId == null || productModels.size() == 0) {
 			log.error("Failed to add records in the shopping cart. No shopping cart/products provided!");
 
 		}
 		log.info("Add records for the shopping cartId: {}", shoppingCartId);
 
-		Optional<MongoCartDocument> cartDocument = mongoCartRepository.findById(shoppingCartId);
+		Optional<CustomerProducts> cartDocument = mongoCartRepository.findById(shoppingCartId);
 		if (cartDocument.isPresent()) {
 			return updateMongoCartDocument(productModels, cartDocument);
 		}
@@ -67,23 +67,23 @@ public class ShoppingCartService {
 		return insertMongoCartDocument(productModels);
 	}
 
-	public Optional<MongoCartDocument> updateShoppingCartRecords(final String customerEcifId, final String productIds) {
+	public Optional<CustomerProducts> updateShoppingCartRecords(final String customerEcifId, final String productIds) {
 		if (customerEcifId == null) {
 			log.error("Failed to update the shopping cart. No valid customerEcifId provided!");
 
 		}
 
-		MongoCartDocument cartDocument = mongoCartRepository.findByCustomerEcifId(customerEcifId);
+		CustomerProducts cartDocument = mongoCartRepository.findByCustomerEcifId(customerEcifId);
 
-		List<MongoProductDocument> mongoProductDocuments = new ArrayList<>();
+		List<Product> products = new ArrayList<>();
 		if (cartDocument != null) {
 			mongoCartRepository.delete(cartDocument);
-			updateProduct(productIds, mongoProductDocuments, cartDocument.getProducts());
-			if (mongoProductDocuments.size() == 0) {
+			updateProduct(productIds, products, cartDocument.getProducts());
+			if (products.size() == 0) {
 				log.warn("Failed to update the shopping cart! Given product codes are not present in the shopping cart!");
 			}
 
-			cartDocument.setProducts(mongoProductDocuments);
+			cartDocument.setProducts(products);
 			log.info("Successfully updated the cart records");
 
 			return Optional.of(mongoCartRepository.insert(cartDocument));
@@ -100,7 +100,7 @@ public class ShoppingCartService {
 			return false;
 		}
 
-		MongoCartDocument cartDocument = mongoCartRepository.findByCustomerEcifId(customerEcifId);
+		CustomerProducts cartDocument = mongoCartRepository.findByCustomerEcifId(customerEcifId);
 		if (cartDocument != null) {
 			mongoCartRepository.delete(cartDocument);
 			log.info("Successfully deleted the shopping cart by customerId: {}", customerEcifId);
@@ -110,10 +110,10 @@ public class ShoppingCartService {
 		return false;
 	}
 
-	private void updateProduct(String productIds, List<MongoProductDocument> mongoProductDocuments,
-							   List<MongoProductDocument> products) {
+	private void updateProduct(String productIds, List<Product> mongoProductDocuments,
+							   List<Product> products) {
 		split(productIds).stream().forEach(id -> mongoProductDocuments.addAll(products.stream().filter(prduct -> id.equals(prduct.getId()))
-				.map(updatedProduct -> MongoProductDocument.builder()
+				.map(updatedProduct -> Product.builder()
 						.productStatus("updated")
 						.id(updatedProduct.getId())
 						.productCode(updatedProduct.getProductCode())
@@ -133,19 +133,19 @@ public class ShoppingCartService {
 				.collect(Collectors.toList());
 	}
 
-	private Optional<MongoCartDocument> updateMongoCartDocument(final List<ProductModel> productModels,
-																final Optional<MongoCartDocument> cartDocument) {
+	private Optional<CustomerProducts> updateMongoCartDocument(final List<ProductModel> productModels,
+                                                               final Optional<CustomerProducts> cartDocument) {
 		mongoCartRepository.delete(cartDocument.get());
 
-		MongoCartDocument updatedCartDocument = cartDocument.get();
+		CustomerProducts updatedCartDocument = cartDocument.get();
 		updatedCartDocument.setProducts(collectProductDocument(productModels));
 
 		return Optional.of(mongoCartRepository.insert(updatedCartDocument));
 	}
 
-	private Optional<MongoCartDocument> insertMongoCartDocument(final List<ProductModel> productModels) {
+	private Optional<CustomerProducts> insertMongoCartDocument(final List<ProductModel> productModels) {
 
-		MongoCartDocument newCartDocument = MongoCartDocument.builder()
+		CustomerProducts newCartDocument = CustomerProducts.builder()
 				.shopCartStatus(ShoppingCartStatus.OPEN.name())
 				.customerEcifId(UUID.randomUUID().toString())
 				.customerProfileType(CustomerProfileType.PERSONAL.name())
@@ -161,8 +161,8 @@ public class ShoppingCartService {
 		return Optional.of(mongoCartRepository.insert(newCartDocument));
 	}
 
-	private List<MongoProductDocument> collectProductDocument(List<ProductModel> productModels) {
-		return productModels.stream().map(productModel -> MongoProductDocument.builder()
+	private List<Product> collectProductDocument(List<ProductModel> productModels) {
+		return productModels.stream().map(productModel -> Product.builder()
 				.id(UUID.randomUUID().toString())
 				.closedBy(productModel.getClosedBy())
 				.closedDate(productModel.getClosedDate())

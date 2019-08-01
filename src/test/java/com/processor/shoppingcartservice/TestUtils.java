@@ -1,7 +1,7 @@
 package com.processor.shoppingcartservice;
 
-import com.processor.shoppingcartservice.document.mongo.MongoCartDocument;
-import com.processor.shoppingcartservice.document.mongo.MongoProductDocument;
+import com.processor.shoppingcartservice.document.mongo.CustomerProducts;
+import com.processor.shoppingcartservice.document.mongo.Product;
 import com.processor.shoppingcartservice.model.CustomerProfileType;
 import com.processor.shoppingcartservice.model.ProductModel;
 import com.processor.shoppingcartservice.model.ShoppingCartStatus;
@@ -17,7 +17,7 @@ public class TestUtils {
 
 	public static final RestTemplate REST = new RestTemplate();
 
-	public static final MongoCartDocument SHOPPING_CART_DOCUMENT = MongoCartDocument.builder()
+	public static final CustomerProducts SHOPPING_CART_DOCUMENT = CustomerProducts.builder()
 			.shopCartStatus(ShoppingCartStatus.OPEN.name())
 			.customerEcifId(UUID.randomUUID().toString())
 			.customerProfileType(CustomerProfileType.PERSONAL.name())
@@ -27,13 +27,13 @@ public class TestUtils {
 			.createdBy("loggedCustommer")
 			.modifiedDate(LocalDateTime.now().toString())
 			.modifiedBy("loggedCustommer")
-			.products(Arrays.asList(MongoProductDocument.builder().id(UUID.randomUUID().toString())
+			.products(Arrays.asList(Product.builder().id(UUID.randomUUID().toString())
 					.productCode(UUID.randomUUID().toString())
 					.productStatus(ShoppingCartStatus.OPEN.name())
 					.productBundleCode(UUID.randomUUID().toString()).build()))
 			.build();
 
-	public static final List<MongoCartDocument> SHOPPING_CART_DOCUMENTS = Arrays.asList(SHOPPING_CART_DOCUMENT);
+	public static final List<CustomerProducts> SHOPPING_CART_DOCUMENTS = Arrays.asList(SHOPPING_CART_DOCUMENT);
 
 	public static final ProductModel SHOPPING_CART_RECORD = ProductModel.builder()
 			.id(UUID.randomUUID().toString()).productCode(UUID.randomUUID().toString())
