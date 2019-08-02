@@ -89,18 +89,19 @@ public class ShoppingCartControllerTest {
 		String customerEcifId = "5628504543";
 		List<ProductModel> shoppingCartRecords = SHOPPING_CART_RECORDS;
 		CustomerProducts expectedResult = SHOPPING_CART_DOCUMENT;
+		final String createdBy = "Mocked person name";
 
 		//when
-		when(shoppingCartService.insertOrUpdateShoppingCartRecords(customerEcifId, shoppingCartRecords))
+		when(shoppingCartService.insertOrUpdateShoppingCartRecords(customerEcifId, shoppingCartRecords, createdBy))
 				.thenReturn(Optional.of(expectedResult));
 		ResponseEntity<CustomerProducts> actual = shoppingCartController.addShoppingCartRecords(customerEcifId,
-				shoppingCartRecords);
+				createdBy, shoppingCartRecords);
 
 		//then
 		assertEquals(HttpStatus.OK, actual.getStatusCode());
 		assertEquals(expectedResult, actual.getBody());
 		verify(shoppingCartService, times(1)).insertOrUpdateShoppingCartRecords(customerEcifId,
-				shoppingCartRecords);
+				shoppingCartRecords, createdBy);
 		assertNotNull(actual.getBody().getProducts());
 		assertTrue(actual.getBody().getProducts().size() > 0);
 		assertNotNull(actual.getBody().getProducts().get(0).getId());
@@ -114,18 +115,19 @@ public class ShoppingCartControllerTest {
 		//given
 		String customerEcifId = "5628504543";
 		List<ProductModel> shoppingCartRecords = SHOPPING_CART_RECORDS;
+		final String createdBy = "Mocked person name";
 
 		//when
-		when(shoppingCartService.insertOrUpdateShoppingCartRecords(customerEcifId, shoppingCartRecords))
+		when(shoppingCartService.insertOrUpdateShoppingCartRecords(customerEcifId, shoppingCartRecords, createdBy))
 				.thenReturn(Optional.empty());
 		ResponseEntity<CustomerProducts> actual = shoppingCartController.addShoppingCartRecords(customerEcifId,
-				shoppingCartRecords);
+				createdBy, shoppingCartRecords);
 
 		//then
 		assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
 		assertNull(actual.getBody());
 		verify(shoppingCartService, times(1)).insertOrUpdateShoppingCartRecords(customerEcifId,
-				shoppingCartRecords);
+				shoppingCartRecords, createdBy);
 	}
 
 
@@ -135,17 +137,19 @@ public class ShoppingCartControllerTest {
 		String customerEcifId = "5628504543";
 		String productIds = "4325435,756765876,56645654,5435,8769679,543424654";
 		CustomerProducts expectedResult = SHOPPING_CART_DOCUMENT;
+		final String modifiedBy = "Mocked person name";
 
 		//when
-		when(shoppingCartService.updateShoppingCartRecords(customerEcifId, productIds)).thenReturn(
+		when(shoppingCartService.updateShoppingCartRecords(customerEcifId, productIds, "Mocked person name")).thenReturn(
 				Optional.of(expectedResult));
 		ResponseEntity<CustomerProducts> actual = shoppingCartController.updateExistingShoppingCart(customerEcifId,
-				productIds);
+				modifiedBy, productIds);
 
 		//then
 		assertEquals(HttpStatus.OK, actual.getStatusCode());
 		assertEquals(expectedResult, actual.getBody());
-		verify(shoppingCartService, times(1)).updateShoppingCartRecords(customerEcifId, productIds);
+		verify(shoppingCartService, times(1)).updateShoppingCartRecords(customerEcifId, productIds,
+				modifiedBy);
 	}
 
 	@Test
@@ -153,18 +157,19 @@ public class ShoppingCartControllerTest {
 		//given
 		String customerEcifId = "5628504543";
 		List<ProductModel> shoppingCartRecords = SHOPPING_CART_RECORDS;
+		final String createdBy = "Mocked person name";
 
 		//when
-		when(shoppingCartService.insertOrUpdateShoppingCartRecords(customerEcifId, shoppingCartRecords))
+		when(shoppingCartService.insertOrUpdateShoppingCartRecords(customerEcifId, shoppingCartRecords, createdBy))
 				.thenReturn(Optional.empty());
 		ResponseEntity<CustomerProducts> actual = shoppingCartController.addShoppingCartRecords(customerEcifId,
-				shoppingCartRecords);
+				createdBy, shoppingCartRecords);
 
 		//then
 		assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
 		assertNull(actual.getBody());
 		verify(shoppingCartService, times(1)).insertOrUpdateShoppingCartRecords(customerEcifId,
-				shoppingCartRecords);
+				shoppingCartRecords, createdBy);
 	}
 
 	@Test

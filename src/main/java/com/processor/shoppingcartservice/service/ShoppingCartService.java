@@ -52,7 +52,8 @@ public class ShoppingCartService {
 	}
 
 	public Optional<CustomerProducts> insertOrUpdateShoppingCartRecords(final String shoppingCartId,
-                                                                        final List<ProductModel> productModels) {
+                                                                        final List<ProductModel> productModels,
+																		final String createdBy) {
 		if (shoppingCartId == null || productModels.size() == 0) {
 			log.error("Failed to add records in the shopping cart. No shopping cart/products provided!");
 
@@ -64,10 +65,11 @@ public class ShoppingCartService {
 			return updateMongoCartDocument(productModels, cartDocument);
 		}
 
-		return insertMongoCartDocument(productModels);
+		return insertMongoCartDocument(productModels, createdBy);
 	}
 
-	public Optional<CustomerProducts> updateShoppingCartRecords(final String customerEcifId, final String productIds) {
+	public Optional<CustomerProducts> updateShoppingCartRecords(final String customerEcifId, final String productIds,
+																final String modifiedBy) {
 		if (customerEcifId == null) {
 			log.error("Failed to update the shopping cart. No valid customerEcifId provided!");
 
@@ -84,6 +86,7 @@ public class ShoppingCartService {
 			}
 
 			cartDocument.setProducts(products);
+			cartDocument.setModifiedBy(modifiedBy);
 			log.info("Successfully updated the cart records");
 
 			return Optional.of(mongoCartRepository.insert(cartDocument));
@@ -143,7 +146,8 @@ public class ShoppingCartService {
 		return Optional.of(mongoCartRepository.insert(updatedCartDocument));
 	}
 
-	private Optional<CustomerProducts> insertMongoCartDocument(final List<ProductModel> productModels) {
+	private Optional<CustomerProducts> insertMongoCartDocument(final List<ProductModel> productModels,
+															   final String createdBy) {
 
 		CustomerProducts newCartDocument = CustomerProducts.builder()
 				.shopCartStatus(ShoppingCartStatus.OPEN)
@@ -152,9 +156,9 @@ public class ShoppingCartService {
 				.createdDate(LocalDateTime.now().toString())
 				.endDate(LocalDateTime.now().plusMinutes(15).toString())
 				.rDate(LocalDate.now().toString())
-				.createdBy("loggedCustommer")
+				.createdBy(createdBy)
 				.modifiedDate(LocalDateTime.now().toString())
-				.modifiedBy("loggedCustommer")
+				.modifiedBy(createdBy)
 				.products(collectProductDocument(productModels))
 				.build();
 

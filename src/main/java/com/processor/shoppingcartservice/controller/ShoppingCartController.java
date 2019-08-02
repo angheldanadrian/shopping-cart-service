@@ -64,12 +64,16 @@ public class ShoppingCartController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "shoppingCartId",
                     value = "Unique ID of a shopping cart", required = true,
-                    dataType = "string", paramType = "path")
+                    dataType = "string", paramType = "path"),
+            @ApiImplicitParam(name = "createdBy", value = "The person name that is creating the shopping cart",
+                    dataType = "string", paramType = "query")
     })
     public ResponseEntity<CustomerProducts> addShoppingCartRecords(@PathVariable final String shoppingCartId,
+                                                                   @RequestParam final String createdBy,
                                                                    @RequestBody final List<ProductModel> productModels) {
 
-        Optional<CustomerProducts> doc = shoppingCartService.insertOrUpdateShoppingCartRecords(shoppingCartId, productModels);
+        Optional<CustomerProducts> doc = shoppingCartService.insertOrUpdateShoppingCartRecords(shoppingCartId,
+                productModels, createdBy);
 
         if (doc.isPresent()) {
             return ResponseEntity.ok(doc.get());
@@ -84,12 +88,16 @@ public class ShoppingCartController {
             @ApiImplicitParam(name = "customerEcifId",
                     value = "Unique ID that is common between Customer Connect and Needs Navigator", required = true,
                     dataType = "string", paramType = "path"),
-            @ApiImplicitParam(name = "productIds", value = "productIds separated by comma", dataType = "string", paramType = "query")
+            @ApiImplicitParam(name = "productIds", value = "productIds separated by comma", dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "modifiedBy", value = "The person name that is modifying the shopping cart",
+                    dataType = "string", paramType = "query")
     })
     public ResponseEntity<CustomerProducts> updateExistingShoppingCart(@PathVariable final String customerEcifId,
+                                                                       @RequestParam final String modifiedBy,
                                                                        @RequestParam final String productIds) {
 
-        Optional<CustomerProducts> doc = shoppingCartService.updateShoppingCartRecords(customerEcifId, productIds);
+        Optional<CustomerProducts> doc = shoppingCartService.updateShoppingCartRecords(customerEcifId, productIds,
+                modifiedBy);
 
         if (doc.isPresent()) {
             return ResponseEntity.ok(doc.get());
