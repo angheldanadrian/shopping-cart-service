@@ -87,6 +87,7 @@ public class ShoppingCartService {
 
 			cartDocument.setProducts(products);
 			cartDocument.setModifiedBy(modifiedBy);
+			cartDocument.setModifiedDate(LocalDateTime.now().toString());
 			log.info("Successfully updated the cart records");
 
 			return Optional.of(mongoCartRepository.insert(cartDocument));
