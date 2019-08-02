@@ -15,24 +15,25 @@ import java.util.Collections;
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
-	@Bean
-	public Docket apiDocket() {
-		return new Docket(DocumentationType.SWAGGER_2)
-				.select()
-				.apis(RequestHandlerSelectors.basePackage("com.processor.shoppingcartservice.controller"))
-				.paths(PathSelectors.any())
-				.build()
-				.apiInfo(apiInfo());
-	}
+    @Bean
+    public Docket apiDocket() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("com.processor.shoppingcartservice.controller"))
+                .paths(PathSelectors.any())
+                .build()
+                .apiInfo(apiInfo());
 
-	private ApiInfo apiInfo() {
-		return new ApiInfo(
-				"Shopping Cart Service REST API",
-				"Responsible for adding, deleting and updating products in the customer shopping cart",
-				"API TOS",
-				"Terms of service",
-				new Contact("", "", "angheldanadrian@gmail.com"),
-				"", "", Collections.emptyList());
-	}
+    }
+
+    private ApiInfo apiInfo() {
+        return new ApiInfo(
+                "Shopping Cart Service REST API",
+                "Responsible for adding, deleting and updating products in the customer shopping cart",
+                "API TOS",
+                "Terms of service",
+                new Contact("", "", "angheldanadrian@gmail.com"),
+                "", "", Collections.emptyList());
+    }
 }
 
