@@ -84,7 +84,8 @@ public class ShoppingCartController {
             return ResponseEntity.ok(doc.get());
         }
 
-        String errorMessage = "There already is a shopping cart with customerEcifId=" + customerEcifId;
+        String errorMessage = "There already is a shopping cart with customerEcifId=" + customerEcifId + " for the " +
+                "customer: " + createdBy;
         ApiError apiError = new ApiError(HttpStatus.METHOD_NOT_ALLOWED, errorMessage, errorMessage);
         return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
     }
