@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,34 +69,37 @@ public class ShoppingCartService {
 		return insertMongoCartDocument(productModels, createdBy, customerProfileType, customerEcifId);
 	}
 
-	public Optional<CustomerProducts> updateShoppingCartRecords(final String customerEcifId, final String productIds,
+	public Optional<CustomerProducts> updateShoppingCartRecords(final String customerEcifId,
+                                                                final List<ProductModel> newProducts,
 																final String modifiedBy) {
 		if (customerEcifId == null) {
-			log.error("Failed to update the shopping cart. No valid customerEcifId provided!");
-
+            log.warn("Failed to update the shopping cart records due to the fact that there is no cart assigned to the " +
+                    "following customerId: {}", customerEcifId);
+            return Optional.empty();
 		}
 
-		CustomerProducts cartDocument = mongoCartRepository.findByCustomerEcifId(customerEcifId);
+		CustomerProducts customerProducts = mongoCartRepository.findByCustomerEcifId(customerEcifId);
 
-		List<Product> products = new ArrayList<>();
-		if (cartDocument != null) {
-			mongoCartRepository.delete(cartDocument);
-			updateProduct(productIds, products, cartDocument.getProducts());
-			if (products.size() == 0) {
-				log.warn("Failed to update the shopping cart! Given product codes are not present in the shopping cart!");
-			}
+        if (customerProducts == null) {
+            log.error("The shopping cart with customerEcifId {} does not exists!", customerEcifId);
+            return Optional.empty();
+        } else {
 
-			cartDocument.setProducts(products);
-			cartDocument.setModifiedBy(modifiedBy);
-			cartDocument.setModifiedDate(LocalDateTime.now().toString());
-			log.info("Successfully updated the cart records");
+            mongoCartRepository.delete(customerProducts);
 
-			return Optional.of(mongoCartRepository.insert(cartDocument));
-		}
+            final List<Product> products = new ArrayList<>();
+            products.addAll(customerProducts.getProducts());
+            products.addAll(mapNewProducts(newProducts, modifiedBy));
 
-		log.warn("Failed to update the shopping cart records due to the fact that there is no cart assigned to the " +
-				"following customerId: {}", customerEcifId);
-		return Optional.empty();
+            customerProducts.setProducts(products);
+
+            customerProducts.setModifiedBy(modifiedBy);
+            customerProducts.setModifiedDate(LocalDateTime.now().toString());
+
+            log.info("Successfully updated the cart records");
+
+            return Optional.of(mongoCartRepository.insert(customerProducts));
+        }
 	}
 
 	public Boolean deleteByCustomerId(final String customerEcifId) {
@@ -116,22 +118,22 @@ public class ShoppingCartService {
 		return false;
 	}
 
-	private void updateProduct(String productIds, List<Product> mongoProductDocuments,
-							   List<Product> products) {
-		split(productIds).stream().forEach(id -> mongoProductDocuments.addAll(products.stream().filter(prduct -> id.equals(prduct.getId()))
-				.map(updatedProduct -> Product.builder()
-						.productStatus("updated")
-						.id(updatedProduct.getId())
-						.productCode(updatedProduct.getProductCode())
-						.productName(updatedProduct.getProductName())
-						.productCategory(updatedProduct.getProductCategory())
-						.productBundleCode(updatedProduct.getProductBundleCode())
-						.createdBy(updatedProduct.getCreatedBy())
-						.createdDate(updatedProduct.getCreatedDate())
-						.closedDate(updatedProduct.getClosedDate())
-						.closedBy(updatedProduct.getClosedBy())
-						.build()).collect(Collectors.toList())));
-	}
+    private List<Product> mapNewProducts(final List<ProductModel> newProductList, final String createdBy) {
+	    return newProductList.stream().map(modelProduct -> {
+	        return Product.builder()
+                    .productCode(modelProduct.getProductCode())
+                    .productName(modelProduct.getProductName())
+                    .productBundleCode(modelProduct.getProductBundleCode())
+                    .productCategory(modelProduct.getProductCategory())
+                    .createdBy(createdBy)
+                    .productStatus(ShoppingCartStatus.OPEN.name())
+                    .id(UUID.randomUUID().toString())
+                    .createdDate(LocalDateTime.now().toString())
+                    .closedBy("")
+                    .closedDate("")
+                    .build();
+        }).collect(Collectors.toList());
+    }
 
 	private List<String> split(String str) {
 		return Stream.of(str.split(","))

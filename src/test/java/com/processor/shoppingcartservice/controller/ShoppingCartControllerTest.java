@@ -131,20 +131,20 @@ public class ShoppingCartControllerTest {
 	public void when_updatingExistingShoppingCart_Expect_ShoppingCartDocument_And_HttpStatusOK() {
 		//given
 		String customerEcifId = "5628504543";
-		String productIds = "4325435,756765876,56645654,5435,8769679,543424654";
+		List<ProductModel> shoppingCartRecords = SHOPPING_CART_RECORDS;
 		CustomerProducts expectedResult = SHOPPING_CART_DOCUMENT;
 		final String modifiedBy = "Mocked person name";
 
 		//when
-		when(shoppingCartService.updateShoppingCartRecords(customerEcifId, productIds, "Mocked person name")).thenReturn(
+		when(shoppingCartService.updateShoppingCartRecords(customerEcifId, shoppingCartRecords, "Mocked person name")).thenReturn(
 				Optional.of(expectedResult));
 		ResponseEntity<CustomerProducts> actual = shoppingCartController.updateExistingShoppingCart(customerEcifId,
-				modifiedBy, productIds);
+				modifiedBy, shoppingCartRecords);
 
 		//then
 		assertEquals(HttpStatus.OK, actual.getStatusCode());
 		assertEquals(expectedResult, actual.getBody());
-		verify(shoppingCartService, times(1)).updateShoppingCartRecords(customerEcifId, productIds,
+		verify(shoppingCartService, times(1)).updateShoppingCartRecords(customerEcifId, shoppingCartRecords,
 				modifiedBy);
 	}
 

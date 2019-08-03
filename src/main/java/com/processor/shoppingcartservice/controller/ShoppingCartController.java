@@ -96,15 +96,14 @@ public class ShoppingCartController {
             @ApiImplicitParam(name = "customerEcifId",
                     value = "Unique ID that is common between Customer Connect and Needs Navigator", required = true,
                     dataType = "string", paramType = "path"),
-            @ApiImplicitParam(name = "productIds", value = "productIds separated by comma", dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "modifiedBy", value = "The person name that is modifying the shopping cart",
                     dataType = "string", paramType = "query")
     })
     public ResponseEntity<CustomerProducts> updateExistingShoppingCart(@PathVariable final String customerEcifId,
                                                                        @RequestParam final String modifiedBy,
-                                                                       @RequestParam final String productIds) {
+                                                                       @RequestBody final List<ProductModel> productModels) {
 
-        Optional<CustomerProducts> doc = shoppingCartService.updateShoppingCartRecords(customerEcifId, productIds,
+        Optional<CustomerProducts> doc = shoppingCartService.updateShoppingCartRecords(customerEcifId, productModels,
                 modifiedBy);
 
         if (doc.isPresent()) {
