@@ -7,7 +7,6 @@ import com.processor.shoppingcartservice.model.ProductModel;
 import com.processor.shoppingcartservice.model.ShoppingCartStatus;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -22,8 +21,6 @@ public class TestUtils {
 			.customerEcifId(UUID.randomUUID().toString())
 			.customerProfileType(CustomerProfileType.PERSONAL)
 			.createdDate(LocalDateTime.now().toString())
-			.endDate(LocalDateTime.now().plusMinutes(15).toString())
-			.rDate(LocalDate.now().toString())
 			.createdBy("loggedCustommer")
 			.modifiedDate(LocalDateTime.now().toString())
 			.modifiedBy("loggedCustommer")
@@ -35,10 +32,5 @@ public class TestUtils {
 
 	public static final List<CustomerProducts> SHOPPING_CART_DOCUMENTS = Arrays.asList(SHOPPING_CART_DOCUMENT);
 
-	public static final ProductModel SHOPPING_CART_RECORD = ProductModel.builder()
-			.id(UUID.randomUUID().toString()).productCode(UUID.randomUUID().toString())
-			.productStatus(ShoppingCartStatus.OPEN.name())
-			.productBundleCode(UUID.randomUUID().toString()).build();
-
-	public static final List<ProductModel> SHOPPING_CART_RECORDS = Arrays.asList(SHOPPING_CART_RECORD);
+	public static final List<ProductModel> SHOPPING_CART_RECORDS = Arrays.asList(new ProductModel());
 }

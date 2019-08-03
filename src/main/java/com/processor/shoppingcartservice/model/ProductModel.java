@@ -1,24 +1,44 @@
 package com.processor.shoppingcartservice.model;
 
-import lombok.*;
+import org.springframework.lang.NonNull;
 
-@Getter
-@Setter
-@Builder
-@ToString
 public class ProductModel {
-	@NonNull
-	private String id;
-	@NonNull
-	private String productStatus;
 	@NonNull
 	private String productCode;
 	private String productName;
-	private String productCategory;
 	@NonNull
+	private String productCategory;
 	private String productBundleCode;
-	private String createdDate;
-	private String createdBy;
-	private String closedDate;
-	private String closedBy;
+
+	public String getProductCode() {
+		return productCode;
+	}
+
+	public String getProductName() {
+		return productName;
+	}
+
+	public String getProductCategory() {
+		return productCategory;
+	}
+
+	public String getProductBundleCode() {
+		return productBundleCode;
+	}
+
+	public void setProductCode(String productCode) {
+		this.productCode = productCode;
+	}
+
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
+
+	public void setProductCategory(String productCategory) {
+		this.productCategory = productCategory;
+	}
+
+	public void setProductBundleCode(String productBundleCode) {
+		this.productBundleCode = productBundleCode;
+	}
 }

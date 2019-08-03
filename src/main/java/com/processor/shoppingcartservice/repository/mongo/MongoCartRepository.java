@@ -8,7 +8,7 @@ import java.util.List;
 
 @Named("mongoCartRepository")
 public interface MongoCartRepository extends MongoRepository<CustomerProducts, String> {
-	List<CustomerProducts> findAllByRDateOrCreatedDateOrEndDate(String rdate, String startdate, String endDate);
+	List<CustomerProducts> findAllByCreatedDate(String startdate);
 
 	CustomerProducts findByCustomerEcifId(String customerEcifId);
 }

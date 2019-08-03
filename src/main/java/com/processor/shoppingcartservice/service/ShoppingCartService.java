@@ -35,7 +35,7 @@ public class ShoppingCartService {
                                                                        final String endDate) {
 		log.info("Search document by rdate: {}, startDate: {}, endDate: {}", rdate, startdate, endDate);
 
-		return mongoCartRepository.findAllByRDateOrCreatedDateOrEndDate(rdate, startdate, endDate);
+		return mongoCartRepository.findAllByCreatedDate(startdate);
 	}
 
 	public Optional<CustomerProducts> findByCustomerId(final String customerId) {
@@ -139,16 +139,6 @@ public class ShoppingCartService {
 				.collect(Collectors.toList());
 	}
 
-	private Optional<CustomerProducts> updateMongoCartDocument(final List<ProductModel> productModels,
-                                                               final Optional<CustomerProducts> cartDocument) {
-		mongoCartRepository.delete(cartDocument.get());
-
-		CustomerProducts updatedCartDocument = cartDocument.get();
-		updatedCartDocument.setProducts(collectProductDocument(productModels));
-
-		return Optional.of(mongoCartRepository.insert(updatedCartDocument));
-	}
-
 	private Optional<CustomerProducts> insertMongoCartDocument(final List<ProductModel> productModels,
 															   final String createdBy,
 															   final CustomerProfileType customerProfileType,
@@ -158,29 +148,27 @@ public class ShoppingCartService {
 				.customerEcifId(customerEcifId)
 				.customerProfileType(customerProfileType)
 				.createdDate(LocalDateTime.now().toString())
-				.endDate(LocalDateTime.now().plusMinutes(15).toString())
-				.rDate(LocalDate.now().toString())
 				.createdBy(createdBy)
 				.modifiedDate(LocalDateTime.now().toString())
 				.modifiedBy(createdBy)
-				.products(collectProductDocument(productModels))
+				.products(collectProductDocument(productModels, createdBy))
 				.build();
 
 		return Optional.of(mongoCartRepository.insert(newCartDocument));
 	}
 
-	private List<Product> collectProductDocument(List<ProductModel> productModels) {
+	private List<Product> collectProductDocument(final List<ProductModel> productModels, final String createdBy) {
 		return productModels.stream().map(productModel -> Product.builder()
 				.id(UUID.randomUUID().toString())
-				.closedBy(productModel.getClosedBy())
-				.closedDate(productModel.getClosedDate())
-				.createdBy(productModel.getCreatedBy())
-				.createdDate(productModel.getCreatedDate())
-				.productBundleCode(productModel.getProductBundleCode())
+				.closedBy("")
+				.closedDate("")
+				.createdBy(createdBy)
+				.createdDate(LocalDateTime.now().toString())
+				.productBundleCode(productModel.getProductBundleCode() != null ? productModel.getProductBundleCode() : "")
 				.productCategory(productModel.getProductCategory())
 				.productCode(productModel.getProductCode())
 				.productName(productModel.getProductName())
-				.productStatus(productModel.getProductStatus())
+				.productStatus(ShoppingCartStatus.OPEN.name())
 				.build()).collect(Collectors.toList());
 	}
 }
