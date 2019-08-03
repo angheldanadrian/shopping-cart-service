@@ -29,6 +29,11 @@ public class ShoppingCartService {
 	@Autowired
 	private MongoCartRepository mongoCartRepository;
 
+	public List<CustomerProducts> findAll() {
+		log.info("Getting all shopping cart records");
+
+		return mongoCartRepository.findAll();
+	}
 
 	public List<CustomerProducts> findAllByRDateOrCreatedDateOrEndDate(final String rdate, final String startdate,
                                                                        final String endDate) {

@@ -66,6 +66,20 @@ public class ShoppingCartControllerTest {
 	}
 
 	@Test
+	public void when_gettingAllRecords_Expect_ListOfShoppingCartDocuments() {
+		//given
+		List<CustomerProducts> expectedResult = SHOPPING_CART_DOCUMENTS;
+
+		//when
+		when(shoppingCartService.findAll()).thenReturn(expectedResult);
+		List<CustomerProducts> actual = shoppingCartController.getAllShoppingCartRecords();
+
+		//then
+		assertEquals(expectedResult, actual);
+		verify(shoppingCartService, times(1)).findAll();
+	}
+
+	@Test
 	public void when_filteringCustomerShoppingCartRecords_Expect_ShoppingCartDocument() {
 		//given
 		String rdate = LocalDate.now().plusDays(1).toString();
