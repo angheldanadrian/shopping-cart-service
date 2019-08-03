@@ -13,12 +13,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -28,6 +28,9 @@ public class ShoppingCartService {
 	@Qualifier("mongoCartRepository")
 	@Autowired
 	private MongoCartRepository mongoCartRepository;
+
+	private final String DATE_TIME_PATTERN = "yyy-MM-dd HH:mm";
+	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN);
 
 	public List<CustomerProducts> findAll() {
 		log.info("Getting all shopping cart records");
@@ -39,7 +42,7 @@ public class ShoppingCartService {
                                                                        final String endDate) {
 		log.info("Search document by rdate: {}, startDate: {}, endDate: {}", rdate, startdate, endDate);
 
-		return mongoCartRepository.findAllByCreatedDate(startdate);
+		return mongoCartRepository.findAllByRDateOrCreatedDateOrEndDate(rdate, startdate, endDate);
 	}
 
 	public Optional<CustomerProducts> findByCustomerId(final String customerId) {
@@ -99,7 +102,7 @@ public class ShoppingCartService {
             customerProducts.setProducts(products);
 
             customerProducts.setModifiedBy(modifiedBy);
-            customerProducts.setModifiedDate(LocalDateTime.now().toString());
+            customerProducts.setModifiedDate(formatter.format(LocalDateTime.now()));
 
             log.info("Successfully updated the cart records");
 
@@ -124,39 +127,32 @@ public class ShoppingCartService {
 	}
 
     private List<Product> mapNewProducts(final List<ProductModel> newProductList, final String createdBy) {
-	    return newProductList.stream().map(modelProduct -> {
-	        return Product.builder()
-                    .productCode(modelProduct.getProductCode())
-                    .productName(modelProduct.getProductName())
-                    .productBundleCode(modelProduct.getProductBundleCode())
-                    .productCategory(modelProduct.getProductCategory())
-                    .createdBy(createdBy)
-                    .productStatus(ShoppingCartStatus.OPEN.name())
-                    .id(UUID.randomUUID().toString())
-                    .createdDate(LocalDateTime.now().toString())
-                    .closedBy("")
-                    .closedDate("")
-                    .build();
-        }).collect(Collectors.toList());
+	    return newProductList.stream().map(modelProduct -> Product.builder()
+				.productCode(modelProduct.getProductCode())
+				.productName(modelProduct.getProductName())
+				.productBundleCode(modelProduct.getProductBundleCode())
+				.productCategory(modelProduct.getProductCategory())
+				.createdBy(createdBy)
+				.productStatus(ShoppingCartStatus.OPEN.name())
+				.id(UUID.randomUUID().toString())
+				.createdDate(formatter.format(LocalDateTime.now()))
+				.closedBy("")
+				.closedDate("")
+				.build()).collect(Collectors.toList());
     }
-
-	private List<String> split(String str) {
-		return Stream.of(str.split(","))
-				.map(String::new)
-				.collect(Collectors.toList());
-	}
 
 	private Optional<CustomerProducts> insertMongoCartDocument(final List<ProductModel> productModels,
 															   final String createdBy,
 															   final CustomerProfileType customerProfileType,
 															   final String customerEcifId) {
+
 		CustomerProducts newCartDocument = CustomerProducts.builder()
 				.shopCartStatus(ShoppingCartStatus.OPEN)
 				.customerEcifId(customerEcifId)
 				.customerProfileType(customerProfileType)
-				.createdDate(LocalDateTime.now().toString())
+				.createdDate(formatter.format(LocalDateTime.now()))
 				.createdBy(createdBy)
-				.modifiedDate(LocalDateTime.now().toString())
+				.modifiedDate(formatter.format(LocalDateTime.now()))
 				.modifiedBy(createdBy)
 				.products(collectProductDocument(productModels, createdBy))
 				.build();
@@ -170,7 +166,7 @@ public class ShoppingCartService {
 				.closedBy("")
 				.closedDate("")
 				.createdBy(createdBy)
-				.createdDate(LocalDateTime.now().toString())
+				.createdDate(formatter.format(LocalDateTime.now()))
 				.productBundleCode(productModel.getProductBundleCode() != null ? productModel.getProductBundleCode() : "")
 				.productCategory(productModel.getProductCategory())
 				.productCode(productModel.getProductCode())

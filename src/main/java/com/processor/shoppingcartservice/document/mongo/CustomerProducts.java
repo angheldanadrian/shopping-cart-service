@@ -23,6 +23,8 @@ public class CustomerProducts {
     private String customerEcifId;
     private CustomerProfileType customerProfileType;
     private String createdDate;
+    private String endDate;
+    private String rDate;
     private String createdBy;
     private String modifiedDate;
     private String modifiedBy;
