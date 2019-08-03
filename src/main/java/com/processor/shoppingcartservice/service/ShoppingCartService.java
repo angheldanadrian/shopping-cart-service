@@ -51,21 +51,41 @@ public class ShoppingCartService {
 		return Optional.of(customerProducts);
 	}
 
-	public Optional<CustomerProducts> insertOrUpdateShoppingCartRecords(final String shoppingCartId,
-                                                                        final List<ProductModel> productModels,
-																		final String createdBy) {
-		if (shoppingCartId == null || productModels.size() == 0) {
-			log.error("Failed to add records in the shopping cart. No shopping cart/products provided!");
-
+	public Optional<CustomerProducts> insertShoppingCartRecords(final String customerEcifId,
+																final List<ProductModel> productModels,
+																final String createdBy,
+																final CustomerProfileType customerProfileType) {
+		if (customerEcifId == null || productModels.size() == 0) {
+			log.error("Failed to add records in the shopping cart. No shopping cart customerEcifId/products provided!");
+			return Optional.empty();
 		}
-		log.info("Add records for the shopping cartId: {}", shoppingCartId);
 
-		Optional<CustomerProducts> cartDocument = mongoCartRepository.findById(shoppingCartId);
+		CustomerProducts customerProducts = mongoCartRepository.findByCustomerEcifId(customerEcifId);
+		if (customerProducts != null) {
+			log.error("The shopping cart with customerEcifId {} already exists!", customerEcifId);
+			return Optional.empty();
+		}
+		log.info("Add records for the shopping cartId: {}", customerEcifId);
+
+		return insertMongoCartDocument(productModels, createdBy, customerProfileType);
+	}
+
+	public Optional<CustomerProducts> insertOrUpdateShoppingCartRecords(final String customerEcifId,
+                                                                        final List<ProductModel> productModels,
+																		final String createdBy,
+																		final CustomerProfileType customerProfileType) {
+		if (customerEcifId == null || productModels.size() == 0) {
+			log.error("Failed to add records in the shopping cart. No shopping cart customerEcifId/products provided!");
+		}
+
+		log.info("Add records for the shopping cartId: {}", customerEcifId);
+
+		Optional<CustomerProducts> cartDocument = mongoCartRepository.findById(customerEcifId);
 		if (cartDocument.isPresent()) {
 			return updateMongoCartDocument(productModels, cartDocument);
 		}
 
-		return insertMongoCartDocument(productModels, createdBy);
+		return insertMongoCartDocument(productModels, createdBy, customerProfileType);
 	}
 
 	public Optional<CustomerProducts> updateShoppingCartRecords(final String customerEcifId, final String productIds,
@@ -148,12 +168,12 @@ public class ShoppingCartService {
 	}
 
 	private Optional<CustomerProducts> insertMongoCartDocument(final List<ProductModel> productModels,
-															   final String createdBy) {
-
+															   final String createdBy,
+															   final CustomerProfileType customerProfileType) {
 		CustomerProducts newCartDocument = CustomerProducts.builder()
 				.shopCartStatus(ShoppingCartStatus.OPEN)
 				.customerEcifId(UUID.randomUUID().toString())
-				.customerProfileType(CustomerProfileType.PERSONAL)
+				.customerProfileType(customerProfileType)
 				.createdDate(LocalDateTime.now().toString())
 				.endDate(LocalDateTime.now().plusMinutes(15).toString())
 				.rDate(LocalDate.now().toString())

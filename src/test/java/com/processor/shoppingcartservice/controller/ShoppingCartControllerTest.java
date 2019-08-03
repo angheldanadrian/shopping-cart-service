@@ -1,6 +1,7 @@
 package com.processor.shoppingcartservice.controller;
 
 import com.processor.shoppingcartservice.document.mongo.CustomerProducts;
+import com.processor.shoppingcartservice.model.CustomerProfileType;
 import com.processor.shoppingcartservice.model.ProductModel;
 import com.processor.shoppingcartservice.model.ShoppingCartStatus;
 import com.processor.shoppingcartservice.service.ShoppingCartService;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.processor.shoppingcartservice.TestUtils.*;
 import static org.junit.Assert.*;
@@ -86,48 +88,42 @@ public class ShoppingCartControllerTest {
 	@Test
 	public void when_addingShoppingCartRecords_Expect_ShoppingCartDocument_And_HttpStatusOK() {
 		//given
-		String customerEcifId = "5628504543";
+		String customerEcifId = UUID.randomUUID().toString();
 		List<ProductModel> shoppingCartRecords = SHOPPING_CART_RECORDS;
 		CustomerProducts expectedResult = SHOPPING_CART_DOCUMENT;
 		final String createdBy = "Mocked person name";
 
 		//when
-		when(shoppingCartService.insertOrUpdateShoppingCartRecords(customerEcifId, shoppingCartRecords, createdBy))
-				.thenReturn(Optional.of(expectedResult));
-		ResponseEntity<CustomerProducts> actual = shoppingCartController.addShoppingCartRecords(customerEcifId,
-				createdBy, shoppingCartRecords);
+		when(shoppingCartService.insertShoppingCartRecords(customerEcifId, shoppingCartRecords, createdBy,
+				CustomerProfileType.PERSONAL)).thenReturn(Optional.of(expectedResult));
+		ResponseEntity<Object> actual = shoppingCartController.addShoppingCartRecords(customerEcifId,
+				createdBy, CustomerProfileType.PERSONAL, shoppingCartRecords);
 
 		//then
 		assertEquals(HttpStatus.OK, actual.getStatusCode());
 		assertEquals(expectedResult, actual.getBody());
-		verify(shoppingCartService, times(1)).insertOrUpdateShoppingCartRecords(customerEcifId,
-				shoppingCartRecords, createdBy);
-		assertNotNull(actual.getBody().getProducts());
-		assertTrue(actual.getBody().getProducts().size() > 0);
-		assertNotNull(actual.getBody().getProducts().get(0).getId());
-		assertNotNull(actual.getBody().getProducts().get(0).getProductBundleCode());
-		assertNotNull(actual.getBody().getProducts().get(0).getProductCode());
-		assertEquals(ShoppingCartStatus.OPEN.name(), actual.getBody().getProducts().get(0).getProductStatus());
+		verify(shoppingCartService, times(1)).insertShoppingCartRecords(customerEcifId,
+				shoppingCartRecords, createdBy, CustomerProfileType.PERSONAL);
 	}
 
 	@Test
-	public void when_addingShoppingCartRecords_Expect_HttpStatusNotFound() {
+	public void when_addingShoppingCartRecords_Expect_HttpStatusNotAllowed() {
 		//given
 		String customerEcifId = "5628504543";
 		List<ProductModel> shoppingCartRecords = SHOPPING_CART_RECORDS;
 		final String createdBy = "Mocked person name";
 
 		//when
-		when(shoppingCartService.insertOrUpdateShoppingCartRecords(customerEcifId, shoppingCartRecords, createdBy))
-				.thenReturn(Optional.empty());
-		ResponseEntity<CustomerProducts> actual = shoppingCartController.addShoppingCartRecords(customerEcifId,
-				createdBy, shoppingCartRecords);
+		when(shoppingCartService.insertShoppingCartRecords(customerEcifId, shoppingCartRecords, createdBy,
+				CustomerProfileType.PERSONAL)).thenReturn(Optional.empty());
+		ResponseEntity<Object> actual = shoppingCartController.addShoppingCartRecords(customerEcifId,
+				createdBy, CustomerProfileType.PERSONAL, shoppingCartRecords);
 
 		//then
-		assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
-		assertNull(actual.getBody());
-		verify(shoppingCartService, times(1)).insertOrUpdateShoppingCartRecords(customerEcifId,
-				shoppingCartRecords, createdBy);
+		assertEquals(HttpStatus.METHOD_NOT_ALLOWED, actual.getStatusCode());
+		assertNotNull(actual.getBody());
+		verify(shoppingCartService, times(1)).insertShoppingCartRecords(customerEcifId,
+				shoppingCartRecords, createdBy, CustomerProfileType.PERSONAL);
 	}
 
 
@@ -153,23 +149,24 @@ public class ShoppingCartControllerTest {
 	}
 
 	@Test
-	public void when_updatingExistingShoppingCart_Expect_HttpStatusNotFound() {
+	public void when_updatingExistingShoppingCart_Expect_HttpStatusNotAllowed() {
 		//given
 		String customerEcifId = "5628504543";
 		List<ProductModel> shoppingCartRecords = SHOPPING_CART_RECORDS;
 		final String createdBy = "Mocked person name";
+		final String customerProfileType = "Personal";
 
 		//when
-		when(shoppingCartService.insertOrUpdateShoppingCartRecords(customerEcifId, shoppingCartRecords, createdBy))
-				.thenReturn(Optional.empty());
-		ResponseEntity<CustomerProducts> actual = shoppingCartController.addShoppingCartRecords(customerEcifId,
-				createdBy, shoppingCartRecords);
+		when(shoppingCartService.insertShoppingCartRecords(customerEcifId, shoppingCartRecords, createdBy,
+				CustomerProfileType.PERSONAL)).thenReturn(Optional.empty());
+		ResponseEntity<Object> actual = shoppingCartController.addShoppingCartRecords(customerEcifId,
+				createdBy, CustomerProfileType.PERSONAL, shoppingCartRecords);
 
 		//then
-		assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
-		assertNull(actual.getBody());
-		verify(shoppingCartService, times(1)).insertOrUpdateShoppingCartRecords(customerEcifId,
-				shoppingCartRecords, createdBy);
+		assertEquals(HttpStatus.METHOD_NOT_ALLOWED, actual.getStatusCode());
+		assertNotNull(actual.getBody());
+		verify(shoppingCartService, times(1)).insertShoppingCartRecords(customerEcifId,
+				shoppingCartRecords, createdBy, CustomerProfileType.PERSONAL);
 	}
 
 	@Test
@@ -190,7 +187,6 @@ public class ShoppingCartControllerTest {
 	public void when_deletingShoppingCartRecords_Expect_HttpStatusNotFound() {
 		//given
 		String customerEcifId = "5628504543";
-		List<ProductModel> shoppingCartRecords = SHOPPING_CART_RECORDS;
 
 		//when
 		when(shoppingCartService.deleteByCustomerId(customerEcifId)).thenReturn(Boolean.FALSE);

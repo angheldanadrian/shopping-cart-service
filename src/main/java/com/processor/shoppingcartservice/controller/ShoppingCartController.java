@@ -1,12 +1,16 @@
 package com.processor.shoppingcartservice.controller;
 
 import com.processor.shoppingcartservice.document.mongo.CustomerProducts;
+import com.processor.shoppingcartservice.model.CustomerProfileType;
 import com.processor.shoppingcartservice.model.ProductModel;
 import com.processor.shoppingcartservice.service.ShoppingCartService;
+import com.processor.shoppingcartservice.utils.ApiError;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,27 +63,30 @@ public class ShoppingCartController {
         return ResponseEntity.notFound().build();
     }
 
-    @PostMapping(path = "/shopping-cart/{shoppingCartId}")
+    @PostMapping(path = "/shopping-cart")
     @ApiOperation(value = "Adds shopping cart records")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "shoppingCartId",
-                    value = "Unique ID of a shopping cart", required = true,
-                    dataType = "string", paramType = "path"),
+            @ApiImplicitParam(name = "customerEcifId", value = "The customer Ecif Id", required = true,
+                    dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "createdBy", value = "The person name that is creating the shopping cart",
+                    required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "customerProfileType", value = "The customer profile type",
                     dataType = "string", paramType = "query")
     })
-    public ResponseEntity<CustomerProducts> addShoppingCartRecords(@PathVariable final String shoppingCartId,
+    public ResponseEntity<Object> addShoppingCartRecords(@RequestParam final String customerEcifId,
                                                                    @RequestParam final String createdBy,
+                                                                   @RequestParam final CustomerProfileType customerProfileType,
                                                                    @RequestBody final List<ProductModel> productModels) {
-
-        Optional<CustomerProducts> doc = shoppingCartService.insertOrUpdateShoppingCartRecords(shoppingCartId,
-                productModels, createdBy);
+        Optional<CustomerProducts> doc = shoppingCartService.insertShoppingCartRecords(customerEcifId,
+                productModels, createdBy, customerProfileType);
 
         if (doc.isPresent()) {
             return ResponseEntity.ok(doc.get());
         }
 
-        return ResponseEntity.notFound().build();
+        String errorMessage = "There already is a shopping cart with customerEcifId=" + customerEcifId;
+        ApiError apiError = new ApiError(HttpStatus.METHOD_NOT_ALLOWED, errorMessage, errorMessage);
+        return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
     }
 
     @PutMapping(path = "/shopping-cart/{customerEcifId}")
