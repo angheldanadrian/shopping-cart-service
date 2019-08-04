@@ -3,7 +3,6 @@ package com.processor.shoppingcartservice.controller;
 import com.processor.shoppingcartservice.document.mongo.CustomerProducts;
 import com.processor.shoppingcartservice.model.CustomerProfileType;
 import com.processor.shoppingcartservice.model.ProductModel;
-import com.processor.shoppingcartservice.model.ShoppingCartStatus;
 import com.processor.shoppingcartservice.service.ShoppingCartService;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,6 +24,7 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ShoppingCartControllerTest {
+
 	private ShoppingCartController shoppingCartController;
 
 	@Mock
@@ -168,7 +169,6 @@ public class ShoppingCartControllerTest {
 		String customerEcifId = "5628504543";
 		List<ProductModel> shoppingCartRecords = SHOPPING_CART_RECORDS;
 		final String createdBy = "Mocked person name";
-		final String customerProfileType = "Personal";
 
 		//when
 		when(shoppingCartService.insertShoppingCartRecords(customerEcifId, shoppingCartRecords, createdBy,
@@ -186,29 +186,39 @@ public class ShoppingCartControllerTest {
 	@Test
 	public void when_deletingShoppingCartRecords_Expect_HttpStatusOK() {
 		//given
-		String customerEcifId = "5628504543";
+		final String customerEcifId = "5628504543";
+		final String modifiedBy = "Mocked Person Name";
+		final List<String> productIds = Arrays.asList("123465356", "7895654376354", "4345456547");
 
 		//when
-		when(shoppingCartService.deleteByCustomerId(customerEcifId)).thenReturn(Boolean.TRUE);
-		ResponseEntity<CustomerProducts> actual = shoppingCartController.deleteShoppingCartRecords(customerEcifId);
+		when(shoppingCartService.deleteShoppingCartRecordsByCustomerId(customerEcifId, modifiedBy, productIds))
+				.thenReturn(Optional.of(SHOPPING_CART_DOCUMENT));
+		ResponseEntity<CustomerProducts> actual = shoppingCartController.deleteShoppingCartRecords(customerEcifId,
+				modifiedBy, productIds);
 
 		//then
 		assertEquals(HttpStatus.OK, actual.getStatusCode());
-		verify(shoppingCartService, times(1)).deleteByCustomerId(customerEcifId);
+		verify(shoppingCartService, times(1)).deleteShoppingCartRecordsByCustomerId(customerEcifId,
+				modifiedBy, productIds);
 	}
 
 	@Test
 	public void when_deletingShoppingCartRecords_Expect_HttpStatusNotFound() {
 		//given
-		String customerEcifId = "5628504543";
+		final String customerEcifId = "5628504543";
+		final String modifiedBy = "Mocked Person Name";
+		final List<String> productIds = Arrays.asList("123465356", "7895654376354", "4345456547");
 
 		//when
-		when(shoppingCartService.deleteByCustomerId(customerEcifId)).thenReturn(Boolean.FALSE);
-		ResponseEntity<CustomerProducts> actual = shoppingCartController.deleteShoppingCartRecords(customerEcifId);
+		when(shoppingCartService.deleteShoppingCartRecordsByCustomerId(customerEcifId, modifiedBy, productIds))
+				.thenReturn(Optional.empty());
+		ResponseEntity<CustomerProducts> actual = shoppingCartController.deleteShoppingCartRecords(customerEcifId,
+				modifiedBy, productIds);
 
 		//then
 		assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
 		assertNull(actual.getBody());
-		verify(shoppingCartService, times(1)).deleteByCustomerId(customerEcifId);
+		verify(shoppingCartService, times(1)).deleteShoppingCartRecordsByCustomerId(customerEcifId,
+				modifiedBy, productIds);
 	}
 }

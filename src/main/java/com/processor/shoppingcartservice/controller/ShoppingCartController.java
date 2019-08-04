@@ -81,9 +81,9 @@ public class ShoppingCartController {
                     dataType = "string", paramType = "query")
     })
     public ResponseEntity<Object> addShoppingCartRecords(@RequestParam final String customerEcifId,
-                                                                   @RequestParam final String createdBy,
-                                                                   @RequestParam final CustomerProfileType customerProfileType,
-                                                                   @RequestBody final List<ProductModel> productModels) {
+                                                         @RequestParam final String createdBy,
+                                                         @RequestParam final CustomerProfileType customerProfileType,
+                                                         @RequestBody final List<ProductModel> productModels) {
         Optional<CustomerProducts> doc = shoppingCartService.insertShoppingCartRecords(customerEcifId,
                 productModels, createdBy, customerProfileType);
 
@@ -110,30 +110,33 @@ public class ShoppingCartController {
                                                                        @RequestParam final String modifiedBy,
                                                                        @RequestBody final List<ProductModel> productModels) {
 
-        Optional<CustomerProducts> doc = shoppingCartService.updateShoppingCartRecords(customerEcifId, productModels,
-                modifiedBy);
-
-        if (doc.isPresent()) {
-            return ResponseEntity.ok(doc.get());
+        final Optional<CustomerProducts> customerProducts = shoppingCartService.updateShoppingCartRecords(customerEcifId,
+                productModels, modifiedBy);
+        if (customerProducts.isPresent()) {
+            return ResponseEntity.ok(customerProducts.get());
         }
 
         return ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping(path = "/shopping-cart/{customerEcifId}")
-    @ApiOperation(value = "Deletes customer shopping cart record")
+    @DeleteMapping(path = "/shopping-cart/products/{customerEcifId}")
+    @ApiOperation(value = "Deletes customer shopping cart records")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "customerEcifId",
                     value = "Unique ID that is common between Customer Connect and Needs Navigator", required = true,
-                    dataType = "string", paramType = "path")
+                    dataType = "string", paramType = "path"),
+            @ApiImplicitParam(name = "modifiedBy", value = "The person name that is modifying the shopping cart",
+                    dataType = "string", paramType = "query")
     })
-    public ResponseEntity<CustomerProducts> deleteShoppingCartRecords(@PathVariable final String customerEcifId) {
-
-        Boolean succeed = shoppingCartService.deleteByCustomerId(customerEcifId);
-        if (succeed == false) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<CustomerProducts> deleteShoppingCartRecords(@PathVariable final String customerEcifId,
+                                                                      @RequestParam final String modifiedBy,
+                                                                      @RequestBody final List<String> productIds) {
+        final Optional<CustomerProducts> customerProducts = shoppingCartService.deleteShoppingCartRecordsByCustomerId(
+                customerEcifId, modifiedBy, productIds);
+        if (customerProducts.isPresent()) {
+            return ResponseEntity.ok(customerProducts.get());
         }
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.notFound().build();
     }
 }

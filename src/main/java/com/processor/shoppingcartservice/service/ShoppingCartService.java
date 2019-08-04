@@ -30,7 +30,7 @@ public class ShoppingCartService {
 	private MongoCartRepository mongoCartRepository;
 
 	private final String DATE_TIME_PATTERN = "yyy-MM-dd HH:mm";
-	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN);
+	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN);
 
 	public List<CustomerProducts> findAll() {
 		log.info("Getting all shopping cart records");
@@ -82,7 +82,7 @@ public class ShoppingCartService {
 																final String modifiedBy) {
 		if (customerEcifId == null) {
             log.warn("Failed to update the shopping cart records due to the fact that there is no cart assigned to the " +
-                    "following customerId: {}", customerEcifId);
+                    "following customerId: null");
             return Optional.empty();
 		}
 
@@ -100,9 +100,8 @@ public class ShoppingCartService {
             products.addAll(mapNewProducts(newProducts, modifiedBy));
 
             customerProducts.setProducts(products);
-
             customerProducts.setModifiedBy(modifiedBy);
-            customerProducts.setModifiedDate(formatter.format(LocalDateTime.now()));
+            customerProducts.setModifiedDate(dateTimeFormatter.format(LocalDateTime.now()));
 
             log.info("Successfully updated the cart records");
 
@@ -110,20 +109,35 @@ public class ShoppingCartService {
         }
 	}
 
-	public Boolean deleteByCustomerId(final String customerEcifId) {
+	public Optional<CustomerProducts> deleteShoppingCartRecordsByCustomerId(final String customerEcifId,
+																			final String modifiedBy,
+																			final List<String> productIds) {
 		if (customerEcifId == null) {
-			log.info("Failed to deleted the shopping cart by customerId: {}", customerEcifId);
-			return false;
+			log.info("Failed to deleted the shopping cart by customerId: null");
+			return Optional.empty();
 		}
 
-		CustomerProducts cartDocument = mongoCartRepository.findByCustomerEcifId(customerEcifId);
-		if (cartDocument != null) {
-			mongoCartRepository.delete(cartDocument);
-			log.info("Successfully deleted the shopping cart by customerId: {}", customerEcifId);
-			return true;
+		final CustomerProducts customerProducts = mongoCartRepository.findByCustomerEcifId(customerEcifId);
+		if (customerProducts != null) {
+			final List<Product> shoppingCartProducts = customerProducts.getProducts();
+			mongoCartRepository.delete(customerProducts);
+
+			productIds.forEach(productId -> shoppingCartProducts.removeIf(product -> productId.equals(product.getId())));
+
+			if (shoppingCartProducts.size() == 0) {
+				customerProducts.setShopCartStatus(ShoppingCartStatus.CLOSED);
+			}
+
+			customerProducts.setModifiedDate(dateTimeFormatter.format(LocalDateTime.now()));
+			customerProducts.setModifiedBy(modifiedBy);
+			customerProducts.setProducts(shoppingCartProducts);
+
+			log.info("Successfully deleted the shopping cart records: {}, by customerId: {}", productIds, customerEcifId);
+
+			return Optional.of(mongoCartRepository.insert(customerProducts));
 		}
 
-		return false;
+		return Optional.empty();
 	}
 
     private List<Product> mapNewProducts(final List<ProductModel> newProductList, final String createdBy) {
@@ -135,7 +149,7 @@ public class ShoppingCartService {
 				.createdBy(createdBy)
 				.productStatus(ShoppingCartStatus.OPEN.name())
 				.id(UUID.randomUUID().toString())
-				.createdDate(formatter.format(LocalDateTime.now()))
+				.createdDate(dateTimeFormatter.format(LocalDateTime.now()))
 				.closedBy("")
 				.closedDate("")
 				.build()).collect(Collectors.toList());
@@ -150,10 +164,12 @@ public class ShoppingCartService {
 				.shopCartStatus(ShoppingCartStatus.OPEN)
 				.customerEcifId(customerEcifId)
 				.customerProfileType(customerProfileType)
-				.createdDate(formatter.format(LocalDateTime.now()))
+				.createdDate(dateTimeFormatter.format(LocalDateTime.now()))
 				.createdBy(createdBy)
-				.modifiedDate(formatter.format(LocalDateTime.now()))
+				.modifiedDate(dateTimeFormatter.format(LocalDateTime.now()))
 				.modifiedBy(createdBy)
+				.rDate("")
+				.endDate("")
 				.products(collectProductDocument(productModels, createdBy))
 				.build();
 
@@ -166,7 +182,7 @@ public class ShoppingCartService {
 				.closedBy("")
 				.closedDate("")
 				.createdBy(createdBy)
-				.createdDate(formatter.format(LocalDateTime.now()))
+				.createdDate(dateTimeFormatter.format(LocalDateTime.now()))
 				.productBundleCode(productModel.getProductBundleCode() != null ? productModel.getProductBundleCode() : "")
 				.productCategory(productModel.getProductCategory())
 				.productCode(productModel.getProductCode())
