@@ -184,6 +184,45 @@ public class ShoppingCartControllerTest {
 	}
 
 	@Test
+	public void when_shoppingCartCheckout_Expect_ShoppingCartDocument_And_HttpStatusOk() {
+		//given
+		String customerEcifId = "5628504543";
+		final List<String> productIds = Arrays.asList("123465356", "7895654376354", "4345456547");
+		final String modifiedBy = "Mocked person name";
+
+		//when
+		when(shoppingCartService.shoppingCartCheckout(customerEcifId, modifiedBy, productIds))
+				.thenReturn(Optional.of(SHOPPING_CART_DOCUMENT));
+		ResponseEntity<CustomerProducts> actual = shoppingCartController.shoppingCartCheckout(customerEcifId,
+				modifiedBy, productIds);
+
+		//then
+		assertEquals(HttpStatus.OK, actual.getStatusCode());
+		assertNotNull(actual.getBody());
+		verify(shoppingCartService, times(1)).shoppingCartCheckout(customerEcifId,
+				modifiedBy, productIds);
+	}
+
+	@Test
+	public void when_shoppingCartCheckout_Expect_HttpStatusNotFound() {
+		//given
+		String customerEcifId = "5628504543";
+		final List<String> productIds = Arrays.asList("123465356", "7895654376354", "4345456547");
+		final String modifiedBy = "Mocked person name";
+
+		//when
+		when(shoppingCartService.shoppingCartCheckout(customerEcifId, modifiedBy, productIds))
+				.thenReturn(Optional.empty());
+		ResponseEntity<CustomerProducts> actual = shoppingCartController.shoppingCartCheckout(customerEcifId,
+				modifiedBy, productIds);
+
+		//then
+		assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
+		verify(shoppingCartService, times(1)).shoppingCartCheckout(customerEcifId,
+				modifiedBy, productIds);
+	}
+
+	@Test
 	public void when_deletingShoppingCartRecords_Expect_HttpStatusOK() {
 		//given
 		final String customerEcifId = "5628504543";

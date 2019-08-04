@@ -119,6 +119,28 @@ public class ShoppingCartController {
         return ResponseEntity.notFound().build();
     }
 
+    @PutMapping(path = "/shopping-cart/checkout/{customerEcifId}")
+    @ApiOperation(value = "Customer shopping cart checkout")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "customerEcifId",
+                    value = "Unique ID that is common between Customer Connect and Needs Navigator", required = true,
+                    dataType = "string", paramType = "path"),
+            @ApiImplicitParam(name = "modifiedBy", value = "The person name that is modifying the shopping cart",
+                    dataType = "string", paramType = "query")
+    })
+    public ResponseEntity<CustomerProducts> shoppingCartCheckout(@PathVariable final String customerEcifId,
+                                                                 @RequestParam final String modifiedBy,
+                                                                 @RequestBody final List<String> productIds) {
+        final Optional<CustomerProducts> customerProducts = shoppingCartService.shoppingCartCheckout(customerEcifId,
+                modifiedBy, productIds);
+
+        if (customerProducts.isPresent()) {
+            return ResponseEntity.ok(customerProducts.get());
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
     @DeleteMapping(path = "/shopping-cart/products/{customerEcifId}")
     @ApiOperation(value = "Deletes customer shopping cart records")
     @ApiImplicitParams({

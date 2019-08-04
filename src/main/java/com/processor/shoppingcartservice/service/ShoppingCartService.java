@@ -107,6 +107,47 @@ public class ShoppingCartService {
         }
 	}
 
+	public Optional<CustomerProducts> shoppingCartCheckout(final String customerEcifId,
+														   final String modifiedBy,
+														   final List<String> productIds) {
+		if (customerEcifId == null) {
+			log.warn("Failed to do shopping cart checkout due to the fact that the customerEcifId is null");
+			return Optional.empty();
+		}
+
+		CustomerProducts customerProducts = mongoCartRepository.findByCustomerEcifId(customerEcifId);
+
+		if (customerProducts == null) {
+			log.error("The shopping cart with customerEcifId {} does not exists!", customerEcifId);
+			return Optional.empty();
+		}
+
+		mongoCartRepository.delete(customerProducts);
+
+		final List<Product> shoppingCartProducts = customerProducts.getProducts();
+		final List<Product> updatedProducts = updateProductsForCheckoutProcess(modifiedBy, productIds, shoppingCartProducts);
+		productIds.forEach(productId -> shoppingCartProducts.removeIf(product -> productId.equals(product.getId())));
+
+		final List<Product> mergedProducts = new ArrayList<>();
+		mergedProducts.addAll(updatedProducts);
+		if (shoppingCartProducts != null && shoppingCartProducts.size() > 0) {
+			mergedProducts.addAll(shoppingCartProducts);
+		}
+
+		customerProducts.setProducts(mergedProducts);
+		customerProducts.setModifiedBy(modifiedBy);
+		customerProducts.setModifiedDate(dateTimeFormatter.format(LocalDateTime.now()));
+
+		final int shoppingCartRecords = shoppingCartProducts.size();
+		int counter = countClosedProductsInShoppingCart(shoppingCartProducts);
+
+		if (shoppingCartRecords == counter) {
+			customerProducts.setShopCartStatus(ShoppingCartStatus.CLOSED);
+		}
+
+		return Optional.of(mongoCartRepository.insert(customerProducts));
+	}
+
 	public Optional<CustomerProducts> deleteShoppingCartRecordsByCustomerId(final String customerEcifId,
 																			final String modifiedBy,
 																			final List<String> productIds) {
@@ -136,6 +177,36 @@ public class ShoppingCartService {
 		}
 
 		return Optional.empty();
+	}
+
+	private int countClosedProductsInShoppingCart(List<Product> shoppingCartProducts) {
+		return (int) shoppingCartProducts.stream()
+				.filter(product -> ShoppingCartStatus.CLOSED.name().equals(product.getProductStatus()))
+				.count();
+	}
+
+	private List<Product> updateProductsForCheckoutProcess(String modifiedBy, List<String> productIds, List<Product> shoppingCartProducts) {
+		final List<Product> updatedProducts = new ArrayList<>();
+
+		productIds.forEach(productId ->
+				updatedProducts.addAll(
+						shoppingCartProducts.stream()
+								.filter(product -> productId.equals(product.getId()))
+								.map(product -> Product.builder()
+										.closedDate(dateTimeFormatter.format(LocalDateTime.now()))
+										.closedBy(modifiedBy)
+										.productStatus(ShoppingCartStatus.CLOSED.name())
+										.id(product.getId())
+										.productCode(product.getProductCode())
+										.productName(product.getProductName())
+										.productCategory(product.getProductCategory())
+										.productBundleCode(product.getProductBundleCode())
+										.createdDate(product.getCreatedDate())
+										.createdBy(product.getCreatedBy())
+										.build())
+								.collect(Collectors.toList())
+				));
+		return updatedProducts;
 	}
 
     private List<Product> mapNewProducts(final List<ProductModel> newProductList, final String createdBy) {
