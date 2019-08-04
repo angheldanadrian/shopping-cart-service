@@ -92,9 +92,7 @@ public class ShoppingCartService {
             log.error("The shopping cart with customerEcifId {} does not exists!", customerEcifId);
             return Optional.empty();
         } else {
-
             mongoCartRepository.delete(customerProducts);
-
             final List<Product> products = new ArrayList<>();
             products.addAll(customerProducts.getProducts());
             products.addAll(mapNewProducts(newProducts, modifiedBy));
