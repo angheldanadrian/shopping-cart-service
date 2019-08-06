@@ -38,18 +38,15 @@ public class ShoppingCartController {
     @GetMapping(path = "/shopping-cart/filter")
     @ApiOperation(value = "Filter customer shopping cart records")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "rdate", value = "A relative date range for the report, such as Today or LastWeek. " +
-                    "For an exact range, use start_date and end_date instead.", dataType = "string", paramType = "query"),
-            @ApiImplicitParam(name = "startdate", value = "The start date for the report. Must be used together with end_date. " +
-                    "This parameter is incompatible with rdate.", dataType = "string", paramType = "query"),
-            @ApiImplicitParam(name = "endDate", value = "The end date for the report. Must be used together with start_date. " +
-                    "This parameter is incompatible with rdate.", dataType = "string", paramType = "query")
+            @ApiImplicitParam(name = "startdate", value = "The start date for the report. Must be used together with end_date. "
+                    , dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "endDate", value = "The end date for the report. Must be used together with start_date. "
+                    , dataType = "string", paramType = "query")
     })
-    public List<CustomerProducts> filterCustomerShoppingCartRecords(@RequestParam(required = false) final String rdate,
-                                                                    @RequestParam(required = false) final String startdate,
+    public List<CustomerProducts> filterCustomerShoppingCartRecords(@RequestParam(required = false) final String startdate,
                                                                     @RequestParam(required = false) final String endDate) {
 
-        return shoppingCartService.findAllByRDateOrCreatedDateOrEndDate(rdate, startdate, endDate);
+        return shoppingCartService.findAllByCreatedDateOrEndDate(startdate, endDate);
     }
 
     @GetMapping(path = "/shopping-cart/{customerEcifId}")

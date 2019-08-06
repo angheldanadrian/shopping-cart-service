@@ -83,21 +83,19 @@ public class ShoppingCartControllerTest {
 	@Test
 	public void when_filteringCustomerShoppingCartRecords_Expect_ShoppingCartDocument() {
 		//given
-		String rdate = LocalDate.now().plusDays(1).toString();
 		String startDate = LocalDate.now().toString();
 		String endDate = LocalDate.now().plusDays(10).toString();
 		List<CustomerProducts> expectedResult = SHOPPING_CART_DOCUMENTS;
 
 		//when
-		when(shoppingCartService.findAllByRDateOrCreatedDateOrEndDate(rdate, startDate, endDate))
+		when(shoppingCartService.findAllByCreatedDateOrEndDate(startDate, endDate))
 				.thenReturn(expectedResult);
 		List<CustomerProducts> actual = shoppingCartController
-				.filterCustomerShoppingCartRecords(rdate, startDate, endDate);
+				.filterCustomerShoppingCartRecords(startDate, endDate);
 
 		//then
 		assertEquals(expectedResult, actual);
-		verify(shoppingCartService, times(1)).findAllByRDateOrCreatedDateOrEndDate(rdate,
-				startDate, endDate);
+		verify(shoppingCartService, times(1)).findAllByCreatedDateOrEndDate(startDate, endDate);
 	}
 
 	@Test

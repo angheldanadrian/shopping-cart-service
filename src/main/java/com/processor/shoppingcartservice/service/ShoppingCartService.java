@@ -38,11 +38,10 @@ public class ShoppingCartService {
 		return mongoCartRepository.findAll();
 	}
 
-	public List<CustomerProducts> findAllByRDateOrCreatedDateOrEndDate(final String rdate, final String startdate,
-                                                                       final String endDate) {
-		log.info("Search document by rdate: {}, startDate: {}, endDate: {}", rdate, startdate, endDate);
+	public List<CustomerProducts> findAllByCreatedDateOrEndDate(final String startdate, final String endDate) {
+		log.info("Search document by startDate: {}, endDate: {}", startdate, endDate);
 
-		return mongoCartRepository.findAllByRDateOrCreatedDateOrEndDate(rdate, startdate, endDate);
+		return mongoCartRepository.findAllByCreatedDateOrEndDate(startdate, endDate);
 	}
 
 	public Optional<CustomerProducts> findByCustomerId(final String customerId) {
@@ -237,7 +236,6 @@ public class ShoppingCartService {
 				.createdBy(createdBy)
 				.modifiedDate(dateTimeFormatter.format(LocalDateTime.now()))
 				.modifiedBy(createdBy)
-				.rDate("")
 				.endDate("")
 				.products(collectProductDocument(productModels, createdBy))
 				.build();

@@ -16,7 +16,6 @@ public class CartModel {
 	private String customerProfileType;
 	private String createdDate;
 	private String endDate;
-	private String rDate;
 	private String createdBy;
 	private String modifiedDate;
 	private String modifiedBy;
